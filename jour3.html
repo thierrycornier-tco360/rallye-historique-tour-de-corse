@@ -105,14 +105,15 @@ h1{font-size:2.2rem;font-weight:800;text-transform:uppercase}
 .stop.done .scard>:not(.fb):not(.donebtn),.stop.done .time{opacity:.45} .stop.next .scard{box-shadow:0 0 0 3px var(--signal)}
 .donebtn{align-self:flex-start;font-size:.88rem;padding:6px 12px}
 .stop.done .donebtn{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
-.stop.cancel .scard h3{text-decoration:line-through}
+.stop.cancel .scard h3,.stop.cancel .scard .place{text-decoration:line-through}
 .chip.bad{background:var(--bad-bg);color:var(--bad)}
 .late{font:700 .8rem var(--f-mono);color:var(--bad)}
 .fb{border-top:1px dashed var(--line);padding-top:8px;display:flex;flex-direction:column;gap:6px}
 .fb textarea{font:500 .95rem var(--f-body);padding:8px;border:1.5px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);min-height:3.2em;resize:vertical;width:100%}
 .fb .saved{background:var(--ok-bg);color:var(--ok);border-radius:6px;padding:6px 10px;font-size:.92rem;white-space:pre-wrap}
 .fb .saved.c{background:var(--info-bg);color:var(--ink)}
-/* Pneus / carburant */
+[hidden]{display:none!important}
+/* Pneus / carburant (masqués, version future) */
 .tbl{width:100%;border-collapse:collapse;font-size:.92rem}
 .tbl th{text-align:left;font:700 .74rem var(--f-display);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:6px;border-bottom:1px solid var(--line)}
 .tbl td{padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
@@ -226,7 +227,7 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
     <ol id="stops" class="stops"></ol>
   </section>
 
-  <section>
+  <section hidden data-v2="pneus"><!-- module mis de côté pour une version future -->
     <h2>Pneus</h2>
     <div class="card">
       <p class="muted">Trois montages possibles : assistance 9 (avant ES 7), assistance 10 (avant ES 8), assistance 11 (avant ES 9 et ES 10). Les km se cumulent par train.</p>
@@ -239,7 +240,7 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
     </div>
   </section>
 
-  <section>
+  <section hidden data-v2="carburant"><!-- module mis de côté pour une version future -->
     <h2>Carburant</h2>
     <div class="card">
       <div class="fgrid">
@@ -406,7 +407,7 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
       else if(c==='f'){var a=v.split('-');['tank','es','li','res'].forEach(function(k,i){if(a[i]!==undefined&&a[i]!=='x'&&isFinite(parseFloat(a[i])))st.fu[k]=a[i];});}
       else if(c==='z'&&/^[L9ABGCP]*$/.test(v)&&v!=='L'){st.fu.z=v;}
       else if(c==='d'&&/^[0-9a-z]{1,4}$/.test(v)){st.done=parseInt(v,36)||0;}
-      else if(c==='x'&&/^[0-9.]{0,20}$/.test(v)){st.x=v;}
+      else if(c==='x'&&/^[0-9a-z.]{0,60}$/.test(v)){st.x=v;}
       else if(c==='e'){v.split('~').forEach(function(x){var m=/^(7|8|9|10)(o|c)([A-Za-z0-9.-]*)$/.exec(x);if(!m)return;if(m[2]==='o')st.fb[m[1]]='ok';else{var t=b64d(m[3]);if(t)st.fb[m[1]]=t.slice(0,500);}});}
     });
     st.ty.r=st.ty.r.map(function(x){return Math.min(x,st.ty.n);});
@@ -456,15 +457,16 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
       cd.append(top,el('div','place',s.p));
       if(s.t==='assist')cd.appendChild(s.who?el('span','chip info','Qui : '+s.who):el('span','chip todo','Qui : à définir'));
       if(s.x)cd.appendChild(el('p','task',s.x));
-      if(s.t==='es'&&isX(s.h.slice(3))){li.classList.add('cancel');cd.appendChild(el('span','chip bad','ES annulée'));}
+      var xid=s.t==='es'?s.h.slice(3):'i'+i;
+      if(isX(xid)){li.classList.add('cancel');cd.appendChild(el('span','chip bad',s.t==='es'?'ES annulée':'Annulée'));}
       if(s.t==='es'){var r=RELAYS.filter(function(R){return R.es.indexOf(s.h.slice(3))>-1;})[0];if(r){var ti=st.ty.r[RELAYS.indexOf(r)];cd.appendChild(el('span','chip info','Train '+ti+' · '+COMP[st.ty.c[ti-1]]));}}
       var isDone=!!(st.done&(1<<i));li.classList.toggle('done',isDone);
       var btn=el('button','donebtn',isDone?'\u2713 Terminé (annuler)':'Marquer terminé');btn.type='button';
       btn.addEventListener('click',function(){st.done^=(1<<i);changed();});
       cd.appendChild(btn);
-      if(s.t==='es'){(function(n){var xb=el('button','donebtn',isX(n)?'Rétablir l\u2019ES '+n:'Marquer l\u2019ES '+n+' annulée');xb.type='button';
+      (function(n,isEs){var xb=el('button','donebtn',isX(n)?(isEs?'Rétablir l\u2019ES '+n:'Rétablir'):(isEs?'Marquer l\u2019ES '+n+' annulée':'Marquer annulée'));xb.type='button';
         xb.addEventListener('click',function(){var L=st.x?st.x.split('.'):[];if(isX(n)){L=L.filter(function(v){return v!==n;});st.done&=~(1<<i);}else{L.push(n);st.done|=(1<<i);}st.x=L.join('.');changed();});
-        cd.appendChild(xb);})(s.h.slice(3));}
+        cd.appendChild(xb);})(xid,s.t==='es');
       if(s.t==='es')cd.appendChild(fbBox(s.h.slice(3),i));
       li.append(tm,cd);ol.appendChild(li);
     });
