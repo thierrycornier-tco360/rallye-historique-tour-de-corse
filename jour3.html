@@ -462,6 +462,9 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
       var btn=el('button','donebtn',isDone?'\u2713 Terminé (annuler)':'Marquer terminé');btn.type='button';
       btn.addEventListener('click',function(){st.done^=(1<<i);changed();});
       cd.appendChild(btn);
+      if(s.t==='es'){(function(n){var xb=el('button','donebtn',isX(n)?'Rétablir l\u2019ES '+n:'Marquer l\u2019ES '+n+' annulée');xb.type='button';
+        xb.addEventListener('click',function(){var L=st.x?st.x.split('.'):[];if(isX(n)){L=L.filter(function(v){return v!==n;});st.done&=~(1<<i);}else{L.push(n);st.done|=(1<<i);}st.x=L.join('.');changed();});
+        cd.appendChild(xb);})(s.h.slice(3));}
       if(s.t==='es')cd.appendChild(fbBox(s.h.slice(3),i));
       li.append(tm,cd);ol.appendChild(li);
     });
