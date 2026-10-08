@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow">
+<title>Assistance Jour 3 n°36</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout : carnet de bord vertical, colonne horaire à gauche, modules pneus et carburant en fiches, pensé pour le téléphone */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --ink:#14212e; --muted:#5b6876; --line:#d3dae2;
+  --signal:#ffd43b; --signal-ink:#14212e; --stage:#c8102e;
+  --ok:#1d7a46; --ok-bg:#e1f2e8; --warn:#b85c00; --warn-bg:#fbeedd; --bad:#c8102e; --bad-bg:#fbe3e6;
+  --todo:#8a6d00; --todo-bg:#fff4c2; --info:#1f5fbf; --info-bg:#e3ecfa;
+  --s7:#c8102e; --s8:#d9730b; --s9:#7a2e9c; --s10:#1a7f6e;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f161d; --surface:#18222c; --ink:#e8edf2; --muted:#9aa7b4; --line:#2b3845;
+  --signal:#ffd43b; --signal-ink:#14212e; --stage:#ff5a6e;
+  --ok:#7fd3a2; --ok-bg:#173326; --warn:#ffb366; --warn-bg:#3a2611; --bad:#ff6b7d; --bad-bg:#3d1a20;
+  --todo:#ffd966; --todo-bg:#3a3110; --info:#8cb6ff; --info-bg:#1b2c47;
+  --s7:#ff6b7d; --s8:#ffa64d; --s9:#c98cf0; --s10:#4fd1b8;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f161d; --surface:#18222c; --ink:#e8edf2; --muted:#9aa7b4; --line:#2b3845;
+  --signal:#ffd43b; --signal-ink:#14212e; --stage:#ff5a6e;
+  --ok:#7fd3a2; --ok-bg:#173326; --warn:#ffb366; --warn-bg:#3a2611; --bad:#ff6b7d; --bad-bg:#3d1a20;
+  --todo:#ffd966; --todo-bg:#3a3110; --info:#8cb6ff; --info-bg:#1b2c47;
+  --s7:#ff6b7d; --s8:#ffa64d; --s9:#c98cf0; --s10:#4fd1b8;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;margin:0}
+.wrap{max-width:780px;margin:0 auto;padding-inline:16px;padding-block:20px 56px;display:flex;flex-direction:column;gap:26px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.05}
+section{display:flex;flex-direction:column;gap:12px}
+section>h2{font-size:1.6rem;text-transform:uppercase;font-weight:800}
+.label{font-family:var(--f-display);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:.8rem;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.muted{color:var(--muted)} p{margin:0;max-width:68ch}
+small{font-size:.8rem}
+button{font:600 .95rem var(--f-body);border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:8px 13px;cursor:pointer}
+button.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--signal);outline-offset:2px}
+input,select{font:600 1rem var(--f-body);padding:7px 9px;border:1.5px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);min-width:0}
+input[type=time],input[type=number]{font-family:var(--f-mono)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+/* En-tête */
+.plate{display:flex;gap:14px;flex-wrap:wrap;align-items:stretch}
+.num{background:var(--signal);color:var(--signal-ink);font:800 3.2rem/1 var(--f-display);padding:8px 14px 6px;border-radius:6px;display:flex;align-items:center}
+.num small{font-size:1.1rem;margin-right:4px}
+h1{font-size:2.2rem;font-weight:800;text-transform:uppercase}
+.facts{display:flex;flex-wrap:wrap;gap:8px}
+.fact{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:.9rem}
+.fact b{font-family:var(--f-mono)}
+/* Bandeaux */
+.banner{border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.banner.todo{background:var(--todo-bg);border:1.5px dashed var(--todo)}
+.banner.todo b{color:var(--todo)}
+.live{display:flex;flex-direction:column;gap:2px;background:var(--signal);color:var(--signal-ink);border-radius:8px;padding:10px 12px}
+.live .k{font:700 .72rem var(--f-display);text-transform:uppercase;letter-spacing:.08em}
+.live .w{font:800 1.35rem/1.1 var(--f-display);text-transform:uppercase}
+.live .c{font:700 1rem var(--f-mono);font-variant-numeric:tabular-nums}
+.live.done{background:var(--surface);color:var(--muted);border:1px solid var(--line)}
+/* Horaires */
+.sched{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;list-style:none;margin:0;padding:0}
+.sched li{border-top:3px solid var(--line);padding-top:6px;display:flex;flex-direction:column;gap:1px;min-width:0}
+.sched li.es{border-top-color:var(--stage)} .sched li.rg{border-top-color:var(--ink)}
+.sched li small{font:700 .72rem var(--f-display);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.sched li span.t{font:700 1.12rem var(--f-mono);font-variant-numeric:tabular-nums}
+.delta{font:700 .7rem var(--f-mono);border-radius:3px;padding:0 4px;background:var(--stage);color:#fff;align-self:flex-start}
+.delta.early{background:var(--ok)}
+.edrows{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.edrow{display:flex;flex-direction:column;gap:3px}
+.edrow label{font:700 .78rem var(--f-display);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.edrow input.changed{border-color:var(--stage)}
+.sharetext{margin:0;white-space:pre-wrap;font:500 .82rem/1.4 var(--f-mono);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;overflow-x:auto}
+/* Alertes */
+.alerts{display:flex;flex-direction:column;gap:8px}
+.alert{border-left:4px solid var(--warn);background:var(--warn-bg);border-radius:6px;padding:10px 12px}
+.alert.bad{border-left-color:var(--bad);background:var(--bad-bg)}
+.alert b{font-family:var(--f-display);font-size:1.05rem;text-transform:uppercase;letter-spacing:.02em}
+/* Déroulé */
+.stops{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.stop{display:grid;grid-template-columns:84px 1fr;gap:12px;position:relative;padding-bottom:16px}
+.stop::before{content:"";position:absolute;left:41px;top:56px;bottom:0;width:2px;background:var(--line)}
+.stop:last-child::before{display:none}
+.time{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
+.clock{font:700 1.1rem var(--f-mono);font-variant-numeric:tabular-nums;background:var(--signal);color:var(--signal-ink);border-radius:5px;padding:6px 4px;width:100%}
+.clock.soft{background:transparent;color:var(--ink);border:2px solid var(--signal)}
+.time small{color:var(--muted);line-height:1.2}
+.scard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 13px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.scard .top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}
+.scard h3{font-size:1.38rem;font-weight:700;text-transform:uppercase}
+.es{color:var(--stage)}
+.dur{font:700 .82rem var(--f-mono);border:1.5px solid var(--ink);border-radius:4px;padding:1px 7px;white-space:nowrap}
+.place{font-weight:600}
+.task{color:var(--muted);font-size:.94rem}
+.chip{font-size:.8rem;font-weight:600;border-radius:4px;padding:2px 8px;align-self:flex-start}
+.chip.todo{background:var(--todo-bg);color:var(--todo)}
+.chip.info{background:var(--info-bg);color:var(--info)}
+.stop.assist .scard{border:2px solid var(--signal)}
+.stop.regroup .scard{border:2px solid var(--ink);background:transparent}
+.stop.done .scard>:not(.fb):not(.donebtn),.stop.done .time{opacity:.45} .stop.next .scard{box-shadow:0 0 0 3px var(--signal)}
+.donebtn{align-self:flex-start;font-size:.88rem;padding:6px 12px}
+.stop.done .donebtn{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
+.late{font:700 .8rem var(--f-mono);color:var(--bad)}
+.fb{border-top:1px dashed var(--line);padding-top:8px;display:flex;flex-direction:column;gap:6px}
+.fb textarea{font:500 .95rem var(--f-body);padding:8px;border:1.5px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);min-height:3.2em;resize:vertical;width:100%}
+.fb .saved{background:var(--ok-bg);color:var(--ok);border-radius:6px;padding:6px 10px;font-size:.92rem;white-space:pre-wrap}
+.fb .saved.c{background:var(--info-bg);color:var(--ink)}
+/* Pneus / carburant */
+.tbl{width:100%;border-collapse:collapse;font-size:.92rem}
+.tbl th{text-align:left;font:700 .74rem var(--f-display);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:6px;border-bottom:1px solid var(--line)}
+.tbl td{padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tblwrap{overflow-x:auto}
+.pill{display:inline-block;font:700 .78rem var(--f-mono);border-radius:999px;padding:2px 9px;white-space:nowrap}
+.pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.bad{background:var(--bad-bg);color:var(--bad)}
+.pill.na{background:var(--bg);color:var(--muted)}
+.bar{height:8px;border-radius:4px;background:var(--bg);overflow:hidden;min-width:70px}
+.bar i{display:block;height:100%;background:var(--ok)}
+.bar i.warn{background:var(--warn)} .bar i.bad{background:var(--bad)}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.fgrid label{display:flex;flex-direction:column;gap:3px;font:700 .78rem var(--f-display);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.checks{display:flex;flex-wrap:wrap;gap:6px 14px}
+.checks label{display:flex;gap:6px;align-items:center;font-size:.92rem}
+.checks input{width:18px;height:18px}
+/* Carte */
+.svgwrap{overflow-x:auto}
+.map svg{display:block;width:100%;max-width:440px;margin:0 auto;height:auto}
+svg .liai{stroke:var(--muted);stroke-width:1.4;stroke-dasharray:4 5;fill:none;opacity:.7}
+svg .ss{fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+svg .s7{stroke:var(--s7)} svg .s8{stroke:var(--s8)} svg .s9{stroke:var(--s9)} svg .s10{stroke:var(--s10)}
+svg .sslbl{font:800 14px var(--f-display);paint-order:stroke;stroke:var(--surface);stroke-width:4px}
+svg .s7t{fill:var(--s7)} svg .s8t{fill:var(--s8)} svg .s9t{fill:var(--s9)} svg .s10t{fill:var(--s10)}
+svg .go{fill:#2f9e44;stroke:var(--surface);stroke-width:2}
+svg .fin{fill:var(--ink);stroke:var(--surface);stroke-width:1.5}
+svg .ref{fill:var(--muted)}
+svg .reflbl{fill:var(--muted);font:500 11px var(--f-body);paint-order:stroke;stroke:var(--surface);stroke-width:3px}
+svg .rdv{fill:var(--signal);stroke:var(--ink);stroke-width:2}
+svg .rdvt{fill:var(--signal-ink);font:700 10px var(--f-mono);text-anchor:middle}
+svg .zone{fill:var(--bad);stroke:var(--surface);stroke-width:1.5}
+svg .zonet{fill:#fff;font:700 10px var(--f-mono);text-anchor:middle}
+svg .lbl{fill:var(--ink);font:700 13px var(--f-display);text-transform:uppercase;paint-order:stroke;stroke:var(--surface);stroke-width:4px}
+.pts a{color:var(--info);font-weight:600;text-decoration:none;white-space:nowrap}
+.pts a:hover,.pts a:focus-visible{text-decoration:underline}
+.todo-box{border:1.5px dashed var(--todo);background:var(--todo-bg);border-radius:10px;padding:14px}
+.todo-box h2{font-size:1.2rem;color:var(--todo);text-transform:uppercase}
+.card a{color:var(--info);font-weight:600}
+.todo-box ul{margin:6px 0 0;padding-left:18px}
+ol.legs{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:10px}
+ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.05rem}
+.tag{font:700 .72rem var(--f-display);text-transform:uppercase;letter-spacing:.05em;border-radius:3px;padding:1px 6px;margin-left:6px}
+.tag.v{background:var(--todo-bg);color:var(--todo)} .tag.c{background:var(--bad-bg);color:var(--bad)}
+@media (max-width:560px){h1{font-size:1.8rem}.num{font-size:2.5rem}.stop{grid-template-columns:68px 1fr;gap:9px}.stop::before{left:33px}.clock{font-size:.95rem}}
+.days{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.days a,.days span.d{font:700 .82rem var(--f-display);text-transform:uppercase;letter-spacing:.05em;border:1.5px solid var(--line);border-radius:999px;padding:5px 12px;text-decoration:none;color:var(--ink);background:var(--surface)}
+.days span.cur{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.days span.off{color:var(--muted);border-style:dashed;background:transparent}
+.days a:focus-visible{outline:3px solid var(--signal);outline-offset:2px}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head><body>
+
+<div class="wrap" lang="fr">
+  <header style="display:flex;flex-direction:column;gap:12px">
+    <nav class="days" aria-label="Changer de jour">
+    <span class="d off">Jour 1 · Mar 6</span>
+    <span class="d off">Jour 2 · Mer 7</span>
+    <span class="d cur" aria-current="page">Jour 3 · Jeu 8</span>
+    <span class="d off">Jour 4 · Ven 9</span>
+    <span class="d off">Jour 5 · Sam 10</span>
+    </nav>
+    <span class="label">Tour de Corse Historique 2026 · Étape 3 · Assistance</span>
+    <div class="plate">
+      <div class="num"><small>N°</small>36</div>
+      <div style="display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:0">
+        <h1>Assistance Jour 3</h1>
+        <div class="muted">Jeudi 8 octobre · Lucciana → Propriano · ES 7 à ES 10</div>
+      </div>
+    </div>
+    <div class="facts">
+      <span class="fact">ES <b>98,3 km</b></span>
+      <span class="fact">Liaisons <b>151,4 km</b></span>
+      <span class="fact">Total <b>251,5 km</b></span>
+      <span class="fact">Regroupement <b>Ghisoni</b></span>
+    </div>
+  </header>
+
+  <div id="offset-banner" class="banner todo" hidden>
+    <b>Horaires de la 1re voiture</b>
+    <p>Ce sont les heures du service book. Entre l'heure de sortie du parc de la voiture 36 (carnet de bord) : toutes les heures se recalent d'un coup.</p>
+    <div class="row"><input type="time" id="off-time" value="07:00" aria-label="Sortie du parc voiture 36"><button type="button" class="primary" id="off-apply">Recaler sur la voiture 36</button></div>
+  </div>
+
+  <section>
+    <div class="row" style="justify-content:space-between"><span class="label">Horaires voiture 36</span><button type="button" id="edit-open">Recaler les heures</button></div>
+    <div id="live" class="live"></div>
+    <p id="sync-status" class="muted" style="font-size:.85rem" hidden></p>
+    <ul id="sched" class="sched"></ul>
+    <form id="editor" class="card" hidden>
+      <p class="muted">Corrige l'heure annoncée (carnet de bord, direction de course), puis envoie le message à l'équipe.</p>
+      <div id="ed-rows" class="edrows"></div>
+      <label class="row" style="font-size:.92rem"><input type="checkbox" id="ed-cascade" checked style="width:18px;height:18px"> Décaler aussi les heures suivantes</label>
+      <div class="row"><button type="submit" class="primary">Enregistrer</button><button type="button" id="ed-reset">Heures 1re voiture</button><button type="button" id="ed-cancel">Annuler</button></div>
+    </form>
+  </section>
+
+  <section>
+    <h2>À retenir</h2>
+    <div class="alerts">
+      <div class="alert bad"><b>ES 8 : 40,8 km d'un seul tenant</b><p>La plus longue spéciale du rallye. Hier, les pneus étaient cuits après 26 km : choisir la gomme en conséquence à l'assistance 10.</p></div>
+      <div class="alert bad"><b>ES 9 + ES 10 : 43,5 km sans assistance</b><p>Entre l'assistance 11 et l'assistance 12, pas d'intervention possible (le regroupement de Ghisoni est un parc). Le train monté à l'assistance 11 fait les deux spéciales.</p></div>
+      <div class="alert"><b>Départ : risque de bouchons</b><p>Le guide d'assistance signale des bouchons possibles entre Lucciana et Folelli (assistance 9). Partir tôt du parc.</p></div>
+      <div class="alert"><b>Altitude et fraîcheur</b><p>L'ES 9 part du col de Sorba et l'ES 10 passe le col de Verde, autour de 1 300 m. Plus frais qu'en plaine en fin de matinée : pneus plus longs à monter en température.</p></div>
+      <div class="alert bad"><b>Kangourous : assistance 11 → Cozzano, 2 h 41</b><p>134 km par Ajaccio pour contourner l'ES 9 et l'ES 10. Arrivée estimée à Cozzano quelques minutes seulement avant le départ de la voiture : partir de l'assistance 11 au plus tôt. Détail dans « Routes de l'assistance ».</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Le déroulé</h2>
+    <ol id="stops" class="stops"></ol>
+  </section>
+
+  <section>
+    <h2>Pneus</h2>
+    <div class="card">
+      <p class="muted">Trois montages possibles : assistance 9 (avant ES 7), assistance 10 (avant ES 8), assistance 11 (avant ES 9 et ES 10). Les km se cumulent par train.</p>
+      <div class="fgrid">
+        <label>Seuil d'alerte (km)<input type="number" id="ty-th" min="5" max="200" step="1" value="26"></label>
+        <label>Nombre de trains<select id="ty-n"><option>2</option><option selected>3</option><option>4</option><option>5</option></select></label>
+      </div>
+      <div class="tblwrap"><table class="tbl"><thead><tr><th>Train</th><th>Gomme</th><th>Km déjà faits</th></tr></thead><tbody id="ty-sets"></tbody></table></div>
+      <div class="tblwrap"><table class="tbl"><thead><tr><th>Montage</th><th>Spéciales</th><th>Train</th><th>Km ES</th><th>Km train en fin</th><th></th></tr></thead><tbody id="ty-relays"></tbody></table></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Carburant</h2>
+    <div class="card">
+      <div class="fgrid">
+        <label>Réservoir (L)<input type="number" id="fu-tank" min="1" step="1" placeholder="ex. réservoir plein"></label>
+        <label>Conso ES (L/100)<input type="number" id="fu-es" min="1" step="0.5"></label>
+        <label>Conso liaison (L/100)<input type="number" id="fu-li" min="1" step="0.5"></label>
+        <label>Réserve (L)<input type="number" id="fu-res" min="0" step="1" value="5"></label>
+      </div>
+      <span class="label">Où ravitailler</span>
+      <div id="fu-points" class="checks"></div>
+      <div class="tblwrap"><table class="tbl"><thead><tr><th>Du point</th><th>Jusqu'à</th><th>Km (dont ES)</th><th>Litres à bord</th><th></th></tr></thead><tbody id="fu-legs"></tbody></table></div>
+      <p class="muted" style="font-size:.85rem">Calcul prudent : la position exacte des zones d'assistance sur la liaison n'étant pas connue, chaque trajet est compté de la position la plus tôt possible à la plus tard possible (km du service book).</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Météo</h2>
+    <div class="card">
+      <p><b>Relevé du 7 octobre au soir :</b> de 8 à 27 °C sur la Corse jeudi, sans prévision horaire fiable trouvée pour les spéciales. Matinée fraîche, surtout en altitude (cols de Sorba et de Verde vers 1 300 m).</p>
+      <p class="muted">Pas de mise à jour automatique pour l'instant. À vérifier au réveil :</p>
+      <div class="row pts">
+        <a href="https://meteofrance.com/previsions-meteo-france/taglio-isolaccio/20230" target="_blank" rel="noopener">ES 7 Taglio-Isolaccio</a>
+        <a href="https://meteofrance.com/previsions-meteo-france/chiatra/20230" target="_blank" rel="noopener">ES 8 Chiatra</a>
+        <a href="https://meteofrance.com/previsions-meteo-france/corte/20250" target="_blank" rel="noopener">Assistance 11 Corte</a>
+        <a href="https://meteofrance.com/previsions-meteo-france/ghisoni/20227" target="_blank" rel="noopener">ES 9 et 10 Ghisoni</a>
+        <a href="https://meteofrance.com/previsions-meteo-france/zicavo/20132" target="_blank" rel="noopener">Arrivée ES 10 Zicavo</a>
+        <a href="https://meteofrance.com/previsions-meteo-france/propriano/20110" target="_blank" rel="noopener">Propriano</a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Routes de l'assistance</h2>
+    <div class="card">
+      <p class="muted">Déduites de la carte assistance étape 3 et du service book, sans calcul d'itinéraire. Chaque trajet est à valider par quelqu'un qui connaît la route.</p>
+      <ol class="legs">
+        <li><b>Lucciana → Assistance 9 (E.Leclerc Folelli)</b><span class="tag" style="background:var(--ok-bg);color:var(--ok)">officiel</span><p>Itinéraire du guide d'assistance : depuis le parc (4385 Strada di a Canonica), T11 vers le sud par Vescovato, puis Folelli. 14,8 km, 22 min sans trafic. <b>Attention, risque de bouchons</b> : quitter le parc bien avant la voiture, qui sort à <b data-t="ch6d"></b> et doit pointer à Taglio à <b data-t="ch7"></b>.</p></li>
+        <li><b>Assistance 9 → Assistance 10</b><span class="tag v">à valider</span><p>Rester sur la route côtière jusqu'au secteur de Cervione. L'ES 7 se court dans les collines à l'ouest : ne pas monter vers Taglio-Isolaccio ou Talasani.</p></li>
+        <li><b>Assistance 10 → Assistance 11 (secteur de Corte)</b><span class="tag v">à valider</span><p><b>Ne pas traîner</b> : il faut être à l'assistance 11 avant la voiture. L'ES 8 (Chiatra → Feo) ferme l'intérieur : contournement possible par la RT10 jusqu'à Aléria puis la T50 vers Corte, jusqu'à la D39.</p></li>
+        <li><b>Assistance 11 → Assistance 12 (Cozzano) · Kangourous</b><span class="tag" style="background:var(--ok-bg);color:var(--ok)">officiel</span><span class="tag c">point critique</span><p>Itinéraire du guide d'assistance : D39, Venaco, Vivario, T20 par Bocognano et Vero, Sarrola-Carcopino, Bastelicaccia, T40 vers Grosseto-Prugna, puis Zicavo et Cozzano. <b>134 km, 2 h 41.</b></p>
+          <p>Estimation, à recaler avec les heures réelles : si les Kangourous quittent l'assistance 11 avec la voiture (vers <b data-t-rel="ch9" data-plus="-25"></b>), arrivée à Cozzano vers <b data-t-rel="ch9" data-plus="136"></b>. La voiture y est attendue vers <b data-t-rel="es10" data-plus="35"></b> et doit en repartir au plus tard vers <b data-t-rel="ch10a" data-plus="-75"></b> pour pointer à Propriano à <b data-t="ch10a"></b>. <b>Fenêtre de quelques minutes seulement, sans aucune marge.</b></p>
+          <p>Piste : les Kangourous partent de l'assistance 11 dès que le gros du travail est fait, Franck termine seul avant de rejoindre Propriano.</p></li>
+        <li><b>Assistance 12 → Propriano</b><span class="tag v">à valider</span><p>Liaison officielle de 61 km vers le podium de Propriano, puis l'aérodrome (assistance 13 et parc fermé). Pointage en avance autorisé.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="map">
+    <h2>La carte du jour</h2>
+    <div class="card">
+      <div class="svgwrap">
+      <svg viewBox="0 0 330 548" role="img" aria-label="Tracés des ES 7 à 10, zones d'assistance 9 à 12, Lucciana, Ghisoni et Propriano">
+<polyline class="liai" points="285.6,32.4 294.6,81.7 283.2,94.7"/>
+<polyline class="liai" points="295.2,120.4 310.4,161.8 280.8,171.9"/>
+<polyline class="liai" points="192.1,172.2 164.6,170.2 155.3,247.7"/>
+<polyline class="liai" points="171.1,277.5 172.4,277.3 169.8,282.6"/>
+<polyline class="liai" points="157.4,359.8 144.2,379.6 39.2,524.9"/>
+<polyline class="ss s7" points="283.2,94.7 282.9,96.3 283.1,96.9 281.9,97.3 282.4,97.7 281.4,99.1 281.5,99.8 281.1,100.4 281.8,100.5 282.3,99.7 283.5,99.6 284.3,100.6 284.1,101.6 284.8,101.3 285.1,101.5 285.2,102.4 285.0,102.8 285.2,103.1 284.7,103.4 284.7,103.8 284.0,103.8 283.7,104.4 283.9,104.6 283.8,105.5 284.5,106.2 283.2,106.4 283.6,107.7 283.5,108.7 284.8,109.8 286.7,109.7 286.0,110.0 285.8,110.9 285.4,111.1 285.3,111.7 285.3,112.5 285.7,112.7 285.5,113.1 286.2,115.1 285.5,115.6 285.1,114.3 284.5,114.0 284.7,115.0 284.3,116.4 283.4,116.9 282.1,116.7 282.0,117.2 282.9,117.2 283.0,117.8 284.3,117.6 284.5,118.0 285.1,118.1 285.0,119.3 285.7,119.2 286.0,119.6 287.2,118.8 287.9,119.4 287.9,120.1 288.8,120.1 288.8,120.8 288.4,121.4 289.3,122.0 289.1,122.8 289.6,123.3 289.8,123.2 289.5,122.9 290.1,122.6 290.9,122.7 291.3,122.4 292.5,123.2 293.4,121.7 294.1,121.4 293.8,120.4 295.2,120.4"/>
+<polyline class="ss s8" points="280.8,171.9 280.4,171.6 278.1,171.6 277.3,170.7 276.9,171.7 276.3,171.8 276.2,171.0 275.4,171.0 275.6,170.3 275.3,169.7 274.8,170.1 273.8,169.7 273.3,170.1 271.4,170.2 271.5,170.8 272.4,171.3 272.1,171.8 272.2,173.0 271.6,172.7 271.2,173.3 271.5,173.8 271.1,174.0 271.8,174.5 271.6,175.2 270.9,175.3 270.9,176.0 270.5,176.5 269.7,176.4 269.4,177.4 269.0,177.6 269.0,178.6 268.5,179.0 268.1,179.0 268.1,178.4 267.4,178.6 267.0,178.0 267.1,176.8 266.2,177.6 265.0,177.2 265.2,176.6 264.4,176.7 263.2,176.2 261.8,177.9 261.9,179.7 261.5,178.5 260.5,178.7 261.3,178.0 261.7,177.1 261.6,176.6 261.0,176.1 260.0,176.1 260.2,175.4 259.4,175.6 259.3,176.2 257.9,177.0 256.5,177.2 256.1,177.9 256.2,178.5 253.8,177.3 251.4,177.4 250.7,177.2 250.2,177.6 249.4,176.8 247.9,176.7 247.3,177.3 247.1,176.9 246.1,177.6 245.7,178.8 244.9,179.3 244.6,180.4 244.1,180.8 243.5,179.8 242.0,179.1 242.2,178.6 241.9,177.8 240.6,177.0 239.9,175.0 240.5,173.4 239.6,172.7 239.8,171.1 238.6,170.9 238.3,169.5 237.2,169.2 235.2,167.7 235.1,168.0 235.8,169.5 235.8,170.2 236.2,170.9 236.0,171.3 236.3,171.6 235.7,172.2 235.4,173.1 235.1,173.2 234.5,172.5 234.1,172.6 233.7,171.6 232.7,171.6 232.3,172.0 232.0,173.5 231.1,173.1 229.4,173.6 229.3,174.6 229.7,176.0 228.0,176.2 227.0,175.7 226.9,176.4 225.9,176.4 226.0,177.6 225.5,177.8 226.7,179.4 228.5,180.2 227.0,180.4 225.8,179.6 225.2,179.7 224.9,180.8 224.3,180.8 224.1,181.6 223.4,181.3 223.2,181.7 222.7,181.9 222.3,183.0 222.2,182.0 222.7,180.8 223.3,180.1 223.4,179.5 224.0,179.0 224.0,177.4 223.5,176.6 222.8,176.5 222.4,175.3 220.5,174.2 219.5,174.3 219.1,174.8 218.7,174.7 216.9,175.9 216.3,175.1 216.4,174.0 215.1,174.7 214.6,173.9 214.2,174.2 212.7,174.3 211.6,173.0 211.1,174.2 211.3,175.4 211.0,175.8 210.9,177.0 209.8,177.9 209.5,178.5 209.6,179.1 209.2,179.6 209.4,179.1 208.9,177.9 209.7,177.3 209.3,176.6 209.5,176.4 208.5,174.4 207.4,174.1 207.4,173.6 206.4,173.3 206.9,172.5 206.6,171.9 207.8,170.8 207.8,169.3 207.0,168.6 206.8,168.7 207.3,169.4 207.0,170.2 205.4,170.2 205.0,170.9 205.0,172.1 204.5,172.0 204.5,172.3 203.9,172.6 201.6,172.5 200.3,173.3 199.0,173.0 198.8,172.6 200.3,172.7 201.0,171.9 201.8,171.7 202.0,171.3 201.4,170.8 200.1,171.7 199.2,171.4 198.7,170.8 197.1,171.2 196.4,170.8 196.0,171.5 195.2,172.0 193.4,172.5 192.1,172.2"/>
+<polyline class="ss s9" points="155.3,247.7 155.7,250.0 156.5,250.6 157.5,250.4 157.3,250.7 157.7,251.1 158.6,251.1 159.0,251.9 160.0,251.1 161.3,251.7 161.5,252.6 162.9,252.7 163.2,252.1 164.1,251.7 164.1,251.2 164.2,251.8 163.5,252.5 163.5,253.2 162.6,253.4 163.7,253.4 163.8,252.9 164.5,252.3 164.0,253.5 163.4,254.0 162.7,254.1 163.8,254.1 165.0,254.6 163.9,254.4 162.6,255.9 162.5,256.4 161.8,256.5 161.3,257.1 161.5,257.9 162.1,258.4 162.0,259.0 163.2,259.3 163.4,259.8 164.0,260.1 164.0,261.7 163.8,262.1 164.5,263.7 165.2,264.0 164.5,265.1 164.9,265.9 164.4,266.9 164.8,267.9 164.0,269.9 163.0,270.3 161.2,268.4 161.1,268.8 161.5,269.7 161.1,270.5 163.5,272.0 165.4,272.4 167.2,271.5 168.0,270.7 168.4,270.7 168.3,271.7 168.7,272.3 168.3,272.9 168.8,273.0 169.1,273.7 171.1,273.8 171.8,275.5 171.1,276.8 171.1,277.5"/>
+<polyline class="ss s10" points="169.8,282.6 169.5,282.7 169.3,283.7 168.7,284.0 166.9,283.5 166.8,284.1 167.3,284.8 166.3,285.0 166.6,285.4 166.3,286.6 166.9,286.8 166.2,287.7 165.9,289.3 164.9,290.8 164.2,290.4 164.2,289.9 163.7,290.5 164.0,291.6 164.6,292.0 165.1,291.9 165.3,292.4 164.0,294.5 161.6,295.1 161.3,295.6 162.0,296.1 163.1,295.8 164.4,296.2 165.1,297.4 165.1,298.1 164.3,299.6 165.2,300.1 165.9,301.6 164.6,302.9 165.5,303.1 165.3,303.8 166.0,304.2 166.3,304.9 166.4,306.6 166.1,307.2 166.6,308.6 165.8,309.7 166.1,310.0 166.1,310.9 165.3,312.4 166.5,312.4 166.7,313.0 167.6,312.5 168.1,312.7 168.7,310.8 168.4,312.3 168.8,313.1 168.3,313.3 168.2,313.8 167.7,313.6 167.1,314.7 165.7,315.9 165.5,315.4 165.4,314.2 165.0,314.1 165.4,314.4 165.3,316.3 165.9,317.3 167.0,316.8 167.2,316.0 167.7,315.6 168.3,315.5 167.5,316.0 167.6,317.0 166.8,317.5 166.3,318.5 165.7,319.0 166.2,320.9 165.4,322.3 166.2,322.8 165.2,323.4 164.9,324.2 165.1,326.0 165.8,326.5 164.8,326.9 164.5,327.5 164.8,327.8 165.2,327.4 165.6,327.6 165.1,328.3 165.2,328.8 164.8,329.4 165.1,330.7 164.6,330.9 165.2,331.6 164.4,332.3 165.0,332.8 164.9,333.3 164.3,333.3 163.6,334.7 163.2,334.9 163.0,336.4 163.2,337.2 162.1,336.8 162.6,337.7 164.5,338.4 163.3,339.5 162.8,339.3 162.5,339.9 162.4,341.3 163.6,341.9 162.5,342.4 161.6,342.4 161.7,343.3 161.4,343.9 162.1,344.1 162.4,345.6 162.8,345.8 162.5,346.1 161.8,345.4 161.5,345.9 160.4,346.5 160.8,347.3 160.5,348.8 161.6,349.1 161.4,350.3 161.8,351.5 161.3,352.4 161.8,352.6 162.6,352.0 163.4,352.2 164.0,351.6 164.0,352.9 164.3,353.2 162.8,353.6 162.6,354.2 162.7,354.9 161.8,355.3 161.6,355.8 159.6,356.5 158.1,358.2 158.3,359.0 157.6,359.3 157.4,359.8"/>
+<circle class="ref" cx="271.8" cy="-55.5" r="2.5"/><text class="reflbl" x="276.8" y="-51.5">Bastia</text>
+<circle class="ref" cx="147.1" cy="163.4" r="2.5"/><text class="reflbl" x="152.1" y="167.4">Corte</text>
+<circle class="ref" cx="297.9" cy="273.2" r="2.5"/><text class="reflbl" x="302.9" y="277.2">Aléria</text>
+<circle class="ref" cx="253.1" cy="325.8" r="2.5"/><text class="reflbl" x="258.1" y="329.8">Ghisonaccia</text>
+<circle class="ref" cx="-24.1" cy="380.2" r="2.5"/><text class="reflbl" x="-19.1" y="384.2">Ajaccio</text>
+<circle class="ref" cx="44.5" cy="516.2" r="2.5"/><text class="reflbl" x="49.5" y="520.2">Propriano</text>
+<circle class="go" cx="283.2" cy="94.7" r="4.5"/><rect class="fin" x="291.2" y="116.4" width="8" height="8"/>
+<text class="sslbl s7t" x="291.2" y="88.7">ES 7</text>
+<circle class="go" cx="280.8" cy="171.9" r="4.5"/><rect class="fin" x="188.1" y="168.2" width="8" height="8"/>
+<text class="sslbl s8t" x="270.8" y="161.9">ES 8</text>
+<circle class="go" cx="155.3" cy="247.7" r="4.5"/><rect class="fin" x="167.1" y="273.5" width="8" height="8"/>
+<text class="sslbl s9t" x="115.30000000000001" y="247.7">ES 9</text>
+<circle class="go" cx="169.8" cy="282.6" r="4.5"/><rect class="fin" x="153.4" y="355.8" width="8" height="8"/>
+<text class="sslbl s10t" x="175.8" y="292.6">ES 10</text>
+<rect class="zone" x="283.6" y="73.7" width="22" height="16" rx="3"/><text class="zonet" x="294.6" y="85.7">A9</text>
+<rect class="zone" x="299.4" y="153.8" width="22" height="16" rx="3"/><text class="zonet" x="310.4" y="165.8">A10</text>
+<rect class="zone" x="153.6" y="162.2" width="22" height="16" rx="3"/><text class="zonet" x="164.6" y="174.2">A11</text>
+<rect class="zone" x="133.2" y="371.6" width="22" height="16" rx="3"/><text class="zonet" x="144.2" y="383.6">A12</text>
+<circle class="rdv" cx="285.6" cy="32.4" r="8"/><text class="rdvt" x="285.6" y="35.9">L</text><text class="lbl" x="297.6" y="36.4">Lucciana</text>
+<circle class="rdv" cx="172.4" cy="277.3" r="8"/><text class="rdvt" x="172.4" y="280.8">G</text><text class="lbl" x="184.4" y="281.3">Ghisoni</text>
+<circle class="rdv" cx="39.2" cy="524.9" r="8"/><text class="rdvt" x="39.2" y="528.4">P</text><text class="lbl" x="9.200000000000003" y="546.9">Propriano</text>
+      </svg>
+      </div>
+      <p class="muted" style="font-size:.85rem">Tracés officiels TDCH 26. Carrés rouges : zones d'assistance placées d'après la carte assistance étape 3 (± 2 km). Les pointillés relient les étapes dans l'ordre, ce ne sont pas les routes.</p>
+    </div>
+    <div class="tblwrap"><table class="tbl pts"><thead><tr><th>Heure</th><th>Point</th><th>Y aller</th></tr></thead><tbody id="nav"></tbody></table></div>
+    <p class="muted" style="font-size:.85rem">Départs et arrivées d'ES : points de contrôle sur route fermée, ne pas s'y arrêter. Zones d'assistance : position approchée, se fier au fléchage sur place. Vérifier que le GPS n'emprunte pas une spéciale.</p>
+  </section>
+
+  <section>
+    <h2>Références des jours précédents</h2>
+    <div class="card">
+      <span class="label">Jour 1 · mardi 6 octobre · boucle de Calvi</span>
+      <p>ES 1 : <b>42e</b> · ES 2 : <b>58e</b> · <b>47e</b> au général. Les 4 pneus étaient cuits après 26 km dans l'ES 2 : c'est la base du seuil d'alerte pneus.</p>
+      <span class="label">Jour 2 · mercredi 7 octobre · Calvi → Lucciana</span>
+      <p>ES 3 Speloncato 13,6 km · ES 4 Bocca Capanna 26,8 km · ES 5 Aiti-San Lorenzo 29,6 km · ES 6 Barchetta 28,6 km, soit 98,6 km chronométrés. Horaires prévus voiture 36 : ES 3 10:47, ES 4 11:30, ES 5 13:03, regroupement Francardo 14:03, ES 6 15:46, Lucciana 16:56.</p>
+      <p>Résultats : ES 3 : <b>38e</b> · ES 4 : <b>59e</b> · ES 5 : <b>78e</b> · ES 6 : <b>52e</b> · <b>49e</b> au général. Journée très compliquée côté météo et choix des pneus, beaucoup d'abandons.</p>
+          </div>
+  </section>
+
+  <div class="todo-box">
+    <h2>À compléter</h2>
+    <ul>
+      <li>Heure de sortie du parc de la voiture 36 (si pas encore recalée)</li>
+            <li>Gommes disponibles, km des trains, réservoir et consommations</li>
+    </ul>
+  </div>
+</div>
+<script>
+(function(){
+  var BASE_URL=location.href.split('#')[0];
+  var KEYS=['ch6d','ch7','es7','ch8','es8','ch9','es9','ch9a','ch9b','ch10','es10','ch10a','ch10b'];
+  var FIRST={ch6d:'07:00',ch7:'07:45',es7:'07:48',ch8:'08:48',es8:'08:51',ch9:'11:15',es9:'11:18',ch9a:'11:38',ch9b:'12:28',ch10:'12:38',es10:'12:41',ch10a:'14:51',ch10b:'18:11'};
+  var NAMES={ch6d:'Sortie parc Lucciana',ch7:'CH 7 Taglio',es7:'Départ ES 7',ch8:'CH 8 Chiatra',es8:'Départ ES 8',ch9:'CH 9 Col de Sorba',es9:'Départ ES 9',ch9a:'Entrée regroup. Ghisoni',ch9b:'Sortie regroup. Ghisoni',ch10:'CH 10 Col de Verde',es10:'Départ ES 10',ch10a:'Podium Propriano',ch10b:'Parc Propriano'};
+  var SCHED=[['ch6d','Sortie parc',''],['es7','ES 7','es'],['es8','ES 8','es'],['es9','ES 9','es'],['ch9a','Regroup.','rg'],['es10','ES 10','es'],['ch10a','Podium',''],['ch10b','Parc','rg']];
+  var COMP={T:'Sec tendre',M:'Sec medium',D:'Sec dur',I:'Intermédiaire',P:'Pluie',X:'À choisir'};
+  var RELAYS=[{n:'Assistance 9',es:['7'],km:14.016},{n:'Assistance 10',es:['8'],km:40.815},{n:'Assistance 11',es:['9','10'],km:43.512}];
+  var FPTS=[{id:'L',n:'Départ Lucciana',min:0,max:0,es:0},{id:'9',n:'Assistance 9',min:0,max:23.53,es:0},{id:'A',n:'Assistance 10',min:37.816,max:61.566,es:14.016},{id:'B',n:'Assistance 11',min:102.941,max:137.711,es:54.831},{id:'G',n:'Regroupement Ghisoni',min:152.698,max:152.698,es:69.168},{id:'C',n:'Assistance 12',min:184.043,max:245.163,es:98.343},{id:'P',n:'Arrivée Propriano',min:251.493,max:251.493,es:98.343}];
+  var PTS=[['ch6d','Parc fermé Lucciana (départ)',42.540034,9.483179,0,'4385 Strada di a Canonica, Lucciana'],['ch7','Assistance 9 : E.Leclerc Folelli',42.452,9.505,1,'E.Leclerc Folelli, Penta-di-Casinca'],['es7','Départ ES 7 Taglio-Isolaccio',42.42867,9.47753],['','Arrivée ES 7',42.3828,9.50633],['ch8','Assistance 10 (zone approx.)',42.309,9.543,1],['es8','Départ ES 8 Chiatra',42.29094,9.47181],['','Arrivée ES 8 Feo',42.29034,9.25823],['ch9','Assistance 11 : D39 secteur Corte (approx.)',42.294,9.192,1],['es9','Départ ES 9 Col de Sorba',42.15547,9.16967],['ch9a','Regroupement Ghisoni',42.102697,9.210891],['es10','Départ ES 10 Ghisoni',42.093246,9.204631],['','Arrivée ES 10 Fischer',41.955425,9.174712],['ch10a','Assistance 12 : Cozzano',41.92,9.143,1,'Cozzano, Corse'],['ch10b','Parc assistance Propriano (aérodrome)',41.660568,8.890167,0,'Aérodrome de Propriano']];
+  var STOPS=[
+    {t:'parc',h:'Sortie parc',p:'Parc fermé de Lucciana Poretta',dl:'ch6d'},
+    {t:'assist',h:'Assistance 9',who:'Franck + Kangourous',dur:'± 8 min',p:'E.Leclerc Folelli, Penta-di-Casinca, sur la RT10 (zone officielle)',dl:'ch7',x:'Choix des pneus + barre si besoin. Depuis le parc : 14,8 km, 22 min sans trafic par la T11 et Vescovato. Risque de bouchons : partir tôt.'},
+    {t:'es',h:'ES 7',p:'Taglio-Isolaccio / Talasani / Sainte-Lucie-de-Moriani',dl:'es7',km:'14,0 km'},
+    {t:'assist',h:'Assistance 10',who:'Franck + Kangourous',dur:'± 20 min',p:'Sur la RT10, secteur Cervione (zone officielle)',dl:'ch8',x:'Montage pour l’ES 8 : 40,8 km d’un seul tenant. Ne pas traîner : il faut être à l’assistance 11 avant la voiture.'},
+    {t:'es',h:'ES 8',p:'Chiatra / Feo',dl:'es8',km:'40,8 km'},
+    {t:'assist',h:'Assistance 11',who:'Franck + Kangourous',dur:'± 50 min',p:'D39, secteur Corte (zone officielle), liaison vers le col de Sorba',dl:'ch9',x:'Assistance principale. Montage pour ES 9 + ES 10 : 43,5 km sans assistance. Ensuite, Franck part directement au parc d’assistance de Propriano ; les Kangourous filent vers Cozzano (2 h 41).'},
+    {t:'es',h:'ES 9',p:'Col de Sorba / Ghisoni',dl:'es9',km:'14,3 km'},
+    {t:'regroup',h:'Regroupement',p:'Ghisoni, parc de regroupement',dl:'ch9a',end:'ch9b',x:'50 min de pause. Assistance interdite après l’ES 9.'},
+    {t:'es',h:'ES 10',p:'Ghisoni / Fischer par le col de Verde',dl:'es10',km:'29,2 km'},
+    {t:'assist',h:'Assistance 12',who:'Kangourous',p:'Cozzano (zone officielle), liaison vers Propriano',dl:'ch10a',x:'Voiture attendue vers départ ES 10 + 35 min. Kangourous : 134 km et 2 h 41 depuis l’assistance 11, fenêtre très courte (voir Routes).'},
+    {t:'parc',h:'Podium Propriano',p:'Fin d’étape, pointage en avance autorisé',dl:'ch10a'},
+    {t:'parc',h:'Assistance 13 et parc fermé',p:'Aérodrome de Propriano, pointage en avance autorisé',dl:'ch10b'}
+  ];
+
+  function toMin(t){var p=String(t).split(':');return (+p[0])*60+(+p[1]);}
+  function fmt(m){m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');}
+  function valid(t){return /^\d{2}:\d{2}$/.test(t||'')&&toMin(t)<1440;}
+  function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;}
+  function nf(x,d){return x.toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d});}
+
+  var st={times:Object.assign({},FIRST),set:false,ty:{th:26,n:3,c:['X','X','X','X','X'],k:[0,0,0,0,0],r:[1,2,3]},fu:{tank:'70',es:'40',li:'27',res:'5',z:'LB'},done:0,fb:{}};
+
+  function encode(){
+    var s='h'+KEYS.map(function(k){return st.times[k].replace(':','');}).join('-');
+    s+='_t'+st.ty.c.slice(0,st.ty.n).join('')+'_k'+st.ty.k.slice(0,st.ty.n).join('-')+'_r'+st.ty.r.join('')+'_s'+st.ty.th;
+    s+='_f'+[st.fu.tank,st.fu.es,st.fu.li,st.fu.res].map(function(v){return v===''?'x':v;}).join('-')+'_z'+st.fu.z;
+    if(st.done)s+='_d'+st.done.toString(36);
+    var fe=Object.keys(st.fb).filter(function(k){return st.fb[k];}).map(function(k){var f=st.fb[k];return k+(f==='ok'?'o':'c'+b64e(f));});
+    if(fe.length)s+='_e'+fe.join('~');
+    return s;
+  }
+  function decode(h){
+    h=(h||'').replace(/^#/,''); if(!h) return false;
+    var parts=h.split('_'), ok=false;
+    parts.forEach(function(p){
+      var c=p[0], v=p.slice(1);
+      if(c==='h'){var a=v.split('-');if(a.length===KEYS.length){var o={};var good=a.every(function(x,i){var t=x.slice(0,2)+':'+x.slice(2);o[KEYS[i]]=t;return /^\d{4}$/.test(x)&&valid(t);});if(good){st.times=o;st.set=true;ok=true;}}}
+      else if(c==='t'&&/^[TMDIPX]{2,5}$/.test(v)){st.ty.n=v.length;for(var i=0;i<v.length;i++)st.ty.c[i]=v[i];}
+      else if(c==='k'){v.split('-').forEach(function(x,i){var n=parseFloat(x);if(i<5&&isFinite(n)&&n>=0)st.ty.k[i]=n;});}
+      else if(c==='r'&&/^[1-5]{3}$/.test(v)){st.ty.r=v.split('').map(Number);}
+      else if(c==='s'){var n=parseFloat(v);if(isFinite(n)&&n>0)st.ty.th=n;}
+      else if(c==='f'){var a=v.split('-');['tank','es','li','res'].forEach(function(k,i){if(a[i]!==undefined&&a[i]!=='x'&&isFinite(parseFloat(a[i])))st.fu[k]=a[i];});}
+      else if(c==='z'&&/^[L9ABGCP]*$/.test(v)&&v!=='L'){st.fu.z=v;}
+      else if(c==='d'&&/^[0-9a-z]{1,4}$/.test(v)){st.done=parseInt(v,36)||0;}
+      else if(c==='e'){v.split('~').forEach(function(x){var m=/^(7|8|9|10)(o|c)([A-Za-z0-9.-]*)$/.exec(x);if(!m)return;if(m[2]==='o')st.fb[m[1]]='ok';else{var t=b64d(m[3]);if(t)st.fb[m[1]]=t.slice(0,500);}});}
+    });
+    st.ty.r=st.ty.r.map(function(x){return Math.min(x,st.ty.n);});
+    return ok;
+  }
+  function b64e(t){var b=new TextEncoder().encode(t),s='';b.forEach(function(x){s+=String.fromCharCode(x);});return btoa(s).replace(/\+/g,'-').replace(/\//g,'.').replace(/=+$/,'');}
+  function b64d(t){try{t=t.replace(/-/g,'+').replace(/\./g,'/');while(t.length%4)t+='=';var s=atob(t),u=new Uint8Array(s.length);for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return new TextDecoder().decode(u);}catch(e){return '';}}
+  // Mémoire : téléphone (localStorage) + state.json publié par l'organisateur. Le lien WhatsApp n'est appliqué qu'une fois.
+  var curAt=0;
+  function resetVolatile(){st.done=0;st.fb={};}
+  function readLocal(){try{var v=localStorage.getItem('tdch-j3');if(!v)return null;if(v.charAt(0)==='{')return JSON.parse(v);return {s:v,at:0};}catch(e){return null;}}
+  function writeLocal(){try{localStorage.setItem('tdch-j3',JSON.stringify({s:encode(),at:curAt}));}catch(e){}}
+  var queuePublish=function(){};
+  function save(){curAt=Date.now();writeLocal();queuePublish();}
+  (function(){
+    var h=(location.hash||'').replace(/^#/,''),lastH=null,loc=readLocal();
+    try{lastH=localStorage.getItem('tdch-j3-hash');}catch(e){}
+    if(h&&h!==lastH){decode(h);try{localStorage.setItem('tdch-j3-hash',h);}catch(e){}curAt=Date.now();writeLocal();}
+    else if(loc){decode(loc.s);curAt=loc.at||0;}
+    else if(h){decode(h);}
+  })();
+
+  // ---------- Horaires ----------
+  function renderSched(){
+    var ul=document.getElementById('sched');ul.textContent='';
+    SCHED.forEach(function(s){
+      var li=el('li',s[2]);li.append(el('small',null,s[1]),el('span','t',st.times[s[0]]));
+      var d=toMin(st.times[s[0]])-toMin(FIRST[s[0]]);
+      if(st.set&&d)li.append(el('span','delta'+(d<0?' early':''),'1re V. '+(d>0?'+':'')+d));
+      ul.appendChild(li);
+    });
+    document.querySelectorAll('[data-t]').forEach(function(e){e.textContent=st.times[e.dataset.t];});
+    document.querySelectorAll('[data-t-rel]').forEach(function(e){e.textContent=fmt(toMin(st.times[e.dataset.tRel])+(+e.dataset.plus));});
+    document.getElementById('offset-banner').hidden=st.set;
+  }
+  function deadline(s){return toMin(st.times[s.end||s.dl]);}
+  function renderStops(){
+    var ol=document.getElementById('stops');ol.textContent='';
+    STOPS.forEach(function(s,i){
+      var li=el('li','stop'+(s.t==='assist'?' assist':s.t==='regroup'?' regroup':''));li.dataset.i=i;
+      var tm=el('div','time'),c=el('div','clock'+(s.t==='assist'?' soft':''),st.times[s.dl]);tm.appendChild(c);
+      tm.appendChild(el('small',null,s.t==='assist'?'à boucler avant':s.t==='es'?'départ':s.t==='regroup'?'sortie '+st.times[s.end]:'pointage'));
+      var cd=el('div','scard'),top=el('div','top'),h=el('h3',s.t==='es'?'es':null,s.h);top.appendChild(h);
+      if(s.km||s.dur)top.appendChild(el('span','dur',s.km||s.dur));
+      cd.append(top,el('div','place',s.p));
+      if(s.t==='assist')cd.appendChild(s.who?el('span','chip info','Qui : '+s.who):el('span','chip todo','Qui : à définir'));
+      if(s.x)cd.appendChild(el('p','task',s.x));
+      if(s.t==='es'){var r=RELAYS.filter(function(R){return R.es.indexOf(s.h.slice(3))>-1;})[0];if(r){var ti=st.ty.r[RELAYS.indexOf(r)];cd.appendChild(el('span','chip info','Train '+ti+' · '+COMP[st.ty.c[ti-1]]));}}
+      var isDone=!!(st.done&(1<<i));li.classList.toggle('done',isDone);
+      var btn=el('button','donebtn',isDone?'\u2713 Terminé (annuler)':'Marquer terminé');btn.type='button';
+      btn.addEventListener('click',function(){st.done^=(1<<i);changed();});
+      cd.appendChild(btn);
+      if(s.t==='es')cd.appendChild(fbBox(s.h.slice(3),i));
+      li.append(tm,cd);ol.appendChild(li);
+    });
+    tick();
+  }
+  function fbBox(n,i){
+    var box=el('div','fb'),f=st.fb[n];
+    box.appendChild(el('span','label','Retour copilote · ES '+n));
+    if(f){box.appendChild(el('div','saved'+(f==='ok'?'':' c'),f==='ok'?'\u2713 OK, rien à signaler':f));}
+    var row=el('div','row'),ok=el('button',null,'\u2713 OK');ok.type='button';
+    var ta=el('textarea');ta.id='fb-'+n;ta.placeholder='Commentaire : pneus, freins, ressenti, problème…';ta.setAttribute('aria-label','Commentaire copilote ES '+n);if(f&&f!=='ok')ta.value=f;
+    var send=el('button','primary','Enregistrer le commentaire');send.type='button';
+    ok.addEventListener('click',function(){st.fb[n]='ok';st.done|=(1<<i);lastFb=n;changed();});
+    send.addEventListener('click',function(){var t=ta.value.trim();if(!t)return;st.fb[n]=t.slice(0,500);st.done|=(1<<i);lastFb=n;changed();});
+    row.append(ok);box.append(row,ta,send);
+    if(f){var cl=el('button',null,'Effacer le retour');cl.type='button';cl.addEventListener('click',function(){delete st.fb[n];if(lastFb===n)lastFb=null;changed();});box.appendChild(cl);}
+    return box;
+  }
+  var lastFb=null;
+  function tick(){
+    var now=new Date(),nm=now.getHours()*60+now.getMinutes(),next=null;
+    document.querySelectorAll('#stops .stop').forEach(function(li){
+      var i=+li.dataset.i,s=STOPS[i];li.classList.remove('next');
+      if(!(st.done&(1<<i))&&!next)next={li:li,s:s,dl:toMin(st.times[s.dl])};
+    });
+    var live=document.getElementById('live');live.textContent='';
+    if(!next){live.className='live done';live.append(el('span','k','Fin de journée'),el('span','w','Parc fermé de Propriano'));return;}
+    live.className='live';next.li.classList.add('next');
+    var diff=next.dl-nm,when=diff<-1?'heure dépassée de '+(-diff)+' min':diff<=0?'maintenant':diff<60?'dans '+diff+' min':'dans '+Math.floor(diff/60)+' h '+String(diff%60).padStart(2,'0');
+    live.append(el('span','k','Prochain point'+(st.set?'':' · heures 1re voiture')),el('span','w',next.s.h),el('span','c',(next.s.t==='assist'?'À boucler avant ':'Heure ')+fmt(next.dl)+' · '+when),el('span','k',next.s.p));
+  }
+  setInterval(tick,30000);
+
+  // ---------- Éditeur + partage ----------
+  var form=document.getElementById('editor'),rows=document.getElementById('ed-rows');
+  function buildEditor(src){
+    rows.textContent='';
+    KEYS.forEach(function(k){
+      var w=el('div','edrow'),l=el('label',null,NAMES[k]),i=el('input');l.htmlFor='ed-'+k;i.type='time';i.id='ed-'+k;i.value=src[k];i.dataset.prev=src[k];i.dataset.k=k;
+      i.addEventListener('change',function(){
+        if(!valid(i.value)){i.value=i.dataset.prev;return;}
+        var d=toMin(i.value)-toMin(i.dataset.prev),after=false;
+        if(d&&document.getElementById('ed-cascade').checked)rows.querySelectorAll('input').forEach(function(o){if(o===i){after=true;return;}if(after){o.value=fmt(toMin(o.value)+d);o.dataset.prev=o.value;}});
+        i.dataset.prev=i.value;mark();
+      });
+      w.append(l,i);rows.appendChild(w);
+    });mark();
+  }
+  function mark(){rows.querySelectorAll('input').forEach(function(i){i.classList.toggle('changed',i.value!==st.times[i.dataset.k]);});}
+  document.getElementById('edit-open').addEventListener('click',function(){buildEditor(st.times);form.hidden=false;});
+  document.getElementById('ed-cancel').addEventListener('click',function(){form.hidden=true;});
+  document.getElementById('ed-reset').addEventListener('click',function(){buildEditor(FIRST);});
+  form.addEventListener('submit',function(e){e.preventDefault();var o={};if(!KEYS.every(function(k){o[k]=document.getElementById('ed-'+k).value;return valid(o[k]);}))return;st.times=o;st.set=true;form.hidden=true;changed(true);});
+  document.getElementById('off-apply').addEventListener('click',function(){
+    var v=document.getElementById('off-time').value;if(!valid(v))return;var d=toMin(v)-toMin(FIRST.ch6d);
+    KEYS.forEach(function(k){st.times[k]=fmt(toMin(FIRST[k])+d);});st.set=true;changed(true);
+  });
+  var share=el('div','card');share.hidden=true;share.innerHTML='<span class="label">Prévenir l’équipe</span>';
+  var pre=el('pre','sharetext'),cp=el('button','primary','Copier le message WhatsApp'),msg=el('p','muted');cp.type='button';
+  share.append(pre,cp,msg);form.after(share);
+  function shareText(){
+    var L=['Assistance n°36, Jour 3, horaires :'];
+    KEYS.filter(function(k){return /^es|ch6d|ch9a|ch9b|ch10a|ch10b/.test(k);}).forEach(function(k){L.push('- '+NAMES[k]+' : '+st.times[k]);});
+    var fk=['7','8','9','10'].filter(function(k){return st.fb[k];});
+    if(fk.length){L.push('','Retours copilote :');fk.forEach(function(k){L.push('- ES '+k+' : '+(st.fb[k]==='ok'?'OK':st.fb[k]));});}
+    L.push('','Topo à jour : '+BASE_URL+'#'+encode());
+    if(lastFb){L.unshift('ES '+lastFb+' terminée : '+(st.fb[lastFb]==='ok'?'OK':st.fb[lastFb]),'');}
+    return L.join('\n');
+  }
+  cp.addEventListener('click',function(){var t=shareText();function fb(){var r=document.createRange();r.selectNodeContents(pre);var s=getSelection();s.removeAllRanges();s.addRange(r);msg.textContent='Texte sélectionné : fais Copier puis colle-le dans WhatsApp.';}
+    try{navigator.clipboard.writeText(t).then(function(){msg.textContent='Copié. Colle-le dans le groupe WhatsApp.';},fb);}catch(e){fb();}});
+  function changed(showShare){save();renderAll(showShare);}
+  function renderAll(showShare){renderSched();renderStops();renderTyres();renderFuel();renderNav();pre.textContent=shareText();if(showShare!==false){share.hidden=false;msg.textContent='';}}
+
+  // ---------- Pneus ----------
+  function renderTyres(){
+    var n=st.ty.n,tb=document.getElementById('ty-sets');tb.textContent='';
+    document.getElementById('ty-th').value=st.ty.th;document.getElementById('ty-n').value=n;
+    for(var i=0;i<n;i++)(function(i){
+      var tr=el('tr'),sel=el('select'),km=el('input');sel.id='ty-c'+i;sel.setAttribute('aria-label','Gomme train '+(i+1));
+      Object.keys(COMP).forEach(function(k){var o=el('option',null,COMP[k]);o.value=k;if(st.ty.c[i]===k)o.selected=true;sel.appendChild(o);});
+      sel.addEventListener('change',function(){st.ty.c[i]=sel.value;changed();});
+      km.type='number';km.min='0';km.step='0.1';km.id='ty-k'+i;km.value=st.ty.k[i];km.style.width='7em';km.setAttribute('aria-label','Km déjà faits train '+(i+1));
+      km.addEventListener('change',function(){var v=parseFloat(km.value);st.ty.k[i]=isFinite(v)&&v>=0?v:0;changed();});
+      var a=el('td'),b=el('td'),c=el('td');a.appendChild(el('b',null,'Train '+(i+1)));b.appendChild(sel);c.appendChild(km);tr.append(a,b,c);tb.appendChild(tr);
+    })(i);
+    var tr2=document.getElementById('ty-relays');tr2.textContent='';var used=st.ty.k.slice();
+    RELAYS.forEach(function(R,j){
+      var t=st.ty.r[j],end=used[t-1]+R.km;used[t-1]=end;
+      var tr=el('tr'),sel=el('select');sel.id='ty-r'+j;sel.setAttribute('aria-label','Train pour '+R.n);
+      for(var i=1;i<=n;i++){var o=el('option',null,'Train '+i+' · '+COMP[st.ty.c[i-1]]);o.value=i;if(i===t)o.selected=true;sel.appendChild(o);}
+      sel.addEventListener('change',function(){st.ty.r[j]=+sel.value;changed();});
+      var ratio=end/st.ty.th,cls=ratio>1?'bad':ratio>0.85?'warn':'ok';
+      var bar=el('div','bar'),bi=el('i',cls);bi.style.width=Math.min(100,ratio*100)+'%';bar.appendChild(bi);
+      var pill=el('span','pill '+cls,ratio>1?'+'+nf(end-st.ty.th,1)+' km au-delà':ratio>0.85?'Proche du seuil':'OK');
+      var tds=[el('td',null,R.n),el('td',null,'ES '+R.es.join(' + ')),el('td'),el('td','n',nf(R.km,1)),el('td','n'),el('td')];
+      tds[2].appendChild(sel);tds[4].append(nf(end,1)+' ',bar);tds[5].appendChild(pill);tds.forEach(function(d){tr.appendChild(d);});tr2.appendChild(tr);
+    });
+  }
+  document.getElementById('ty-th').addEventListener('change',function(e){var v=parseFloat(e.target.value);if(isFinite(v)&&v>0){st.ty.th=v;changed();}});
+  document.getElementById('ty-n').addEventListener('change',function(e){st.ty.n=+e.target.value;st.ty.r=st.ty.r.map(function(x){return Math.min(x,st.ty.n);});changed();});
+
+  // ---------- Carburant ----------
+  ['tank','es','li','res'].forEach(function(k){var i=document.getElementById('fu-'+k);i.addEventListener('change',function(){var v=parseFloat(i.value);st.fu[k]=isFinite(v)&&v>=0?String(v):'';changed();});});
+  function renderFuel(){
+    ['tank','es','li','res'].forEach(function(k){document.getElementById('fu-'+k).value=st.fu[k];});
+    var box=document.getElementById('fu-points');box.textContent='';
+    FPTS.slice(0,-1).forEach(function(p){
+      var lab=el('label'),cb=el('input');cb.type='checkbox';cb.id='fu-z'+p.id;cb.checked=st.fu.z.indexOf(p.id)>-1;
+      cb.addEventListener('change',function(){var z=FPTS.filter(function(q){var c=document.getElementById('fu-z'+q.id);return c&&c.checked;}).map(function(q){return q.id;}).join('');st.fu.z=z;changed();});
+      lab.append(cb,p.n);box.appendChild(lab);
+    });
+    var sel=FPTS.filter(function(p){return st.fu.z.indexOf(p.id)>-1;});var tb=document.getElementById('fu-legs');tb.textContent='';
+    if(!sel.length||sel[0].id!=='L'){sel.unshift(FPTS[0]);}
+    var tank=parseFloat(st.fu.tank),ce=parseFloat(st.fu.es),cl=parseFloat(st.fu.li),res=parseFloat(st.fu.res)||0,have=isFinite(ce)&&isFinite(cl);
+    sel.forEach(function(p,i){
+      var q=sel[i+1]||FPTS[FPTS.length-1];var tot=q.max-p.min,es=q.es-p.es,li=tot-es;
+      var tr=el('tr'),lit=have?es*ce/100+li*cl/100+res:null;
+      var pill;if(!have)pill=el('span','pill na','Renseigner les conso');else if(isFinite(tank)){var r=lit/tank;pill=el('span','pill '+(r>1?'bad':r>0.9?'warn':'ok'),r>1?'Dépasse le réservoir':r>0.9?'Juste':'OK');}else pill=el('span','pill na','Renseigner le réservoir');
+      [el('td',null,p.n),el('td',null,q.n),el('td','n',nf(tot,1)+' ('+nf(es,1)+')'),el('td','n',have?'≥ '+nf(Math.ceil(lit),0)+' L':'?'),el('td')].forEach(function(d,j){if(j===4)d.appendChild(pill);tr.appendChild(d);});
+      tb.appendChild(tr);
+    });
+  }
+
+  // ---------- Navigation ----------
+  var B64='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+  function ge0(lat,lon,name){var M=Math.pow(2,30)-1,la=Math.round((lat+90)/180*M),lo=Math.floor((lon+180)/360*(M+1)+0.5);if(lo===M+1)lo=0;var s=B64[44];
+    for(var sh=27;sh>=3;sh-=3){var a=Math.floor(la/Math.pow(2,sh))&7,o=Math.floor(lo/Math.pow(2,sh))&7;s+=B64[((a>>2)&1)<<5|((o>>2)&1)<<4|((a>>1)&1)<<3|((o>>1)&1)<<2|(a&1)<<1|(o&1)];}
+    return 'https://omaps.app/'+s+'/'+encodeURIComponent(name.replace(/[^\p{L}\p{N}-]+/gu,'_'));}
+  function renderNav(){
+    var tb=document.getElementById('nav');tb.textContent='';
+    PTS.forEach(function(p){
+      var tr=el('tr'),t=el('td','n',p[0]?st.times[p[0]]:''),n=el('td',null,p[1]),g=el('td');
+      var q=p[5]?encodeURIComponent(p[5]):null;
+      [['Maps',q?'https://www.google.com/maps/dir/?api=1&destination='+q:'https://www.google.com/maps/dir/?api=1&destination='+p[2]+','+p[3]],['Waze',q?'https://waze.com/ul?q='+q+'&navigate=yes':'https://waze.com/ul?ll='+p[2]+','+p[3]+'&navigate=yes'],['Organic',ge0(p[2],p[3],p[1])]].forEach(function(l,i){
+        if(i)g.append(' · ');var a=el('a',null,l[0]);a.href=l[1];a.target='_blank';a.rel='noopener';g.appendChild(a);});
+      tr.append(t,n,g);tb.appendChild(tr);
+    });
+  }
+  renderAll(false);
+  // Diffusion : l'organisateur (seul à pouvoir modifier la page) publie state.json ; tous les téléphones le lisent à l'ouverture.
+  var art=null,canPublish=false,pubTimer=null,stat=document.getElementById('sync-status');
+  function setStat(t){if(stat){stat.textContent=t;stat.hidden=!t;}}
+  function hhmm(ts){var d=new Date(ts);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+  queuePublish=function(){if(!canPublish)return;clearTimeout(pubTimer);setStat('Publication pour l\u2019équipe dans quelques secondes…');
+    pubTimer=setTimeout(function(){var body=JSON.stringify({s:encode(),at:curAt});
+      art.publish({'state.json':body}).then(function(){setStat('\u2713 Publié pour toute l\u2019équipe à '+hhmm(Date.now())+' : le lien simple affiche ces heures.');})
+      .catch(function(e){var c=e&&e.code;if(c==='conflict'){setStat('');return;}if(c==='rate_limited'){setStat('Trop de publications d\u2019affilée : nouvel essai dans 30 s.');pubTimer=setTimeout(queuePublish,30000);return;}
+        canPublish=false;setStat('Modifications gardées sur ce téléphone uniquement : envoie le message WhatsApp.');});},3000);};
+  fetch('state.json',{cache:'no-store'}).then(function(res){return res.ok?res.json():null;}).then(function(d){
+    if(d&&typeof d.s==='string'&&(d.at||0)>curAt){resetVolatile();decode(d.s);curAt=d.at;writeLocal();renderAll(false);}
+    if(d&&d.at)setStat('Heures diffusées par l\u2019organisateur à '+hhmm(d.at)+'.');
+  }).catch(function(){});
+  (async function(){
+    if(!window.claude||!window.claude.use)return;
+    try{art=await window.claude.use('artifact');}catch(e){art=null;}
+    if(art&&typeof art.publish==='function'){canPublish=true;}
+  })();
+})();
+</script>
+
+</body></html>
