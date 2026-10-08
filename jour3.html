@@ -200,6 +200,7 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
 
   <section>
     <div class="row" style="justify-content:space-between"><span class="label">Horaires voiture 36</span><button type="button" id="edit-open">Recaler les heures</button></div>
+    <div id="ab-banner" class="alert bad" hidden></div>
     <div id="live" class="live"></div>
     <p id="sync-status" class="muted" style="font-size:.85rem" hidden></p>
     <ul id="sched" class="sched"></ul>
@@ -382,7 +383,7 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
   function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;}
   function nf(x,d){return x.toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d});}
 
-  var st={times:Object.assign({},FIRST),set:false,ty:{th:26,n:3,c:['X','X','X','X','X'],k:[0,0,0,0,0],r:[1,2,3]},fu:{tank:'70',es:'40',li:'27',res:'5',z:'LB'},done:0,fb:{},x:''};
+  var st={times:Object.assign({},FIRST),set:false,ty:{th:26,n:3,c:['X','X','X','X','X'],k:[0,0,0,0,0],r:[1,2,3]},fu:{tank:'70',es:'40',li:'27',res:'5',z:'LB'},done:0,fb:{},x:'',ab:''};
 
   function encode(){
     var s='h'+KEYS.map(function(k){return st.times[k].replace(':','');}).join('-');
@@ -390,6 +391,7 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
     s+='_f'+[st.fu.tank,st.fu.es,st.fu.li,st.fu.res].map(function(v){return v===''?'x':v;}).join('-')+'_z'+st.fu.z;
     if(st.done)s+='_d'+st.done.toString(36);
     if(st.x)s+='_x'+st.x;
+    if(st.ab)s+='_a'+st.ab;
     var fe=Object.keys(st.fb).filter(function(k){return st.fb[k];}).map(function(k){var f=st.fb[k];return k+(f==='ok'?'o':'c'+b64e(f));});
     if(fe.length)s+='_e'+fe.join('~');
     return s;
@@ -407,6 +409,7 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
       else if(c==='f'){var a=v.split('-');['tank','es','li','res'].forEach(function(k,i){if(a[i]!==undefined&&a[i]!=='x'&&isFinite(parseFloat(a[i])))st.fu[k]=a[i];});}
       else if(c==='z'&&/^[L9ABGCP]*$/.test(v)&&v!=='L'){st.fu.z=v;}
       else if(c==='d'&&/^[0-9a-z]{1,4}$/.test(v)){st.done=parseInt(v,36)||0;}
+      else if(c==='a'&&/^[td](7|8|9|10)$/.test(v)){st.ab=v;}
       else if(c==='x'&&/^[0-9a-z.]{0,60}$/.test(v)){st.x=v;}
       else if(c==='e'){v.split('~').forEach(function(x){var m=/^(7|8|9|10)(o|c)([A-Za-z0-9.-]*)$/.exec(x);if(!m)return;if(m[2]==='o')st.fb[m[1]]='ok';else{var t=b64d(m[3]);if(t)st.fb[m[1]]=t.slice(0,500);}});}
     });
@@ -417,7 +420,10 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
   function b64d(t){try{t=t.replace(/-/g,'+').replace(/\./g,'/');while(t.length%4)t+='=';var s=atob(t),u=new Uint8Array(s.length);for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return new TextDecoder().decode(u);}catch(e){return '';}}
   // Mémoire : téléphone (localStorage) + state.json publié par l'organisateur. Le lien WhatsApp n'est appliqué qu'une fois.
   var curAt=0;
-  function resetVolatile(){st.done=0;st.fb={};st.x='';}
+  function resetVolatile(){st.done=0;st.fb={};st.x='';st.ab='';}
+  function abIdx(){if(!st.ab)return 99;for(var i=0;i<STOPS.length;i++)if(STOPS[i].t==='es'&&STOPS[i].h==='ES '+st.ab.slice(1))return i;return 99;}
+  function skip(i){var t=STOPS[i].t;return i>=abIdx()&&(t==='es'||t==='assist'||t==='regroup'||/^Podium/.test(STOPS[i].h));}
+  function abText(){return st.ab?(st.ab[0]==='t'?'Abandon temporaire à l\u2019ES '+st.ab.slice(1)+' : la voiture rentre au parc avec l\u2019assistance, réparation et reprise prévue demain.':'Abandon définitif à l\u2019ES '+st.ab.slice(1)+'.'):'';}
   function isX(n){return ('.'+st.x+'.').indexOf('.'+n+'.')>-1;}
   var ESKM={'7':14.016,'8':40.815,'9':14.337,'10':29.175};
   function readLocal(){try{var v=localStorage.getItem('tdch-j3');if(!v)return null;if(v.charAt(0)==='{')return JSON.parse(v);return {s:v,at:0};}catch(e){return null;}}
@@ -458,8 +464,11 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
       if(s.t==='assist')cd.appendChild(s.who?el('span','chip info','Qui : '+s.who):el('span','chip todo','Qui : à définir'));
       if(s.x)cd.appendChild(el('p','task',s.x));
       var xid=s.t==='es'?s.h.slice(3):'i'+i;
+      if(skip(i)){li.classList.add('cancel');cd.appendChild(el('span','chip bad',s.t==='es'?'Non courue (abandon)':'Sans objet (abandon)'));}
+      if(s.t==='es'){var en=s.h.slice(3);
+        if(!st.ab){[['t','Abandon temporaire'],['d','Abandon définitif']].forEach(function(o){var b=el('button','donebtn',o[1]+' à l\u2019ES '+en);b.type='button';b.addEventListener('click',function(){if(!confirm(o[1]+' à l\u2019ES '+en+' ? Les spéciales suivantes de la journée seront marquées non courues.'))return;st.ab=o[0]+en;changed(true);});cd.appendChild(b);});}
+        else if(st.ab.slice(1)===en){var b=el('button','donebtn','Annuler l\u2019abandon');b.type='button';b.addEventListener('click',function(){st.ab='';changed(true);});cd.appendChild(b);}}
       if(isX(xid)){li.classList.add('cancel');cd.appendChild(el('span','chip bad',s.t==='es'?'ES annulée':'Annulée'));}
-      if(s.t==='es'){var r=RELAYS.filter(function(R){return R.es.indexOf(s.h.slice(3))>-1;})[0];if(r){var ti=st.ty.r[RELAYS.indexOf(r)];cd.appendChild(el('span','chip info','Train '+ti+' · '+COMP[st.ty.c[ti-1]]));}}
       var isDone=!!(st.done&(1<<i));li.classList.toggle('done',isDone);
       var btn=el('button','donebtn',isDone?'\u2713 Terminé (annuler)':'Marquer terminé');btn.type='button';
       btn.addEventListener('click',function(){st.done^=(1<<i);changed();});
@@ -490,8 +499,9 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
     var now=new Date(),nm=now.getHours()*60+now.getMinutes(),next=null;
     document.querySelectorAll('#stops .stop').forEach(function(li){
       var i=+li.dataset.i,s=STOPS[i];li.classList.remove('next');
-      if(!(st.done&(1<<i))&&!next)next={li:li,s:s,dl:toMin(st.times[s.dl])};
+      if(!(st.done&(1<<i))&&!skip(i)&&!next)next={li:li,s:s,dl:toMin(st.times[s.dl])};
     });
+    var ab=document.getElementById('ab-banner');ab.hidden=!st.ab;ab.textContent='';if(st.ab)ab.append(el('b',null,st.ab[0]==='t'?'Abandon temporaire':'Abandon définitif'),el('p',null,abText()));
     var live=document.getElementById('live');live.textContent='';
     if(!next){live.className='live done';live.append(el('span','k','Fin de journée'),el('span','w','Parc fermé de Propriano'));return;}
     live.className='live';next.li.classList.add('next');
@@ -532,6 +542,7 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
     KEYS.filter(function(k){return /^es|ch6d|ch9a|ch9b|ch10a|ch10b/.test(k);}).forEach(function(k){L.push('- '+NAMES[k]+' : '+st.times[k]);});
     var fk=['7','8','9','10'].filter(function(k){return st.fb[k];});
     if(fk.length){L.push('','Retours copilote :');fk.forEach(function(k){L.push('- ES '+k+' : '+(st.fb[k]==='ok'?'OK':st.fb[k]));});}
+    if(st.ab)L.unshift('Voiture 36 : '+abText().replace(/^A/,'a'),'');
     L.push('','Topo à jour : '+BASE_URL+'#'+encode());
     if(lastFb){L.unshift('ES '+lastFb+' terminée : '+(st.fb[lastFb]==='ok'?'OK':st.fb[lastFb]),'');}
     return L.join('\n');
