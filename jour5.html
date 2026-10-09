@@ -663,7 +663,7 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
         canPublish=false;setStat('Modifications gardées sur ce téléphone uniquement : envoie le message WhatsApp.');});},3000);};
   fetch(STATE_FILE+'?t='+Date.now(),{cache:'no-store'}).then(function(res){return res.ok?res.json():null;}).then(function(d){
     if(d&&typeof d.s==='string'&&(d.at||0)>curAt){resetVolatile();decode(d.s);curAt=d.at;writeLocal();renderAll(false);}
-    else if(d&&typeof d.s==='string'&&(d.at||0)>tat){takeTimes(d.s);writeLocal();renderAll(false);}
+    else if(d&&typeof d.s==='string'&&(d.at||0)>Math.max(tat,DEF.at)){takeTimes(d.s);writeLocal();renderAll(false);}
     if(d&&d.at)setStat('Heures diffusées par l\u2019organisateur à '+hhmm(d.at)+'.');
   }).catch(function(){});
   (async function(){
