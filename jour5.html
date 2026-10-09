@@ -428,7 +428,8 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
   function b64e(t){var b=new TextEncoder().encode(t),s='';b.forEach(function(x){s+=String.fromCharCode(x);});return btoa(s).replace(/\+/g,'-').replace(/\//g,'.').replace(/=+$/,'');}
   function b64d(t){try{t=t.replace(/-/g,'+').replace(/\./g,'/');while(t.length%4)t+='=';var s=atob(t),u=new Uint8Array(s.length);for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return new TextDecoder().decode(u);}catch(e){return '';}}
   // Mémoire : téléphone (localStorage) + state.json publié par l'organisateur. Le lien WhatsApp n'est appliqué qu'une fois.
-  var curAt=0;
+  var curAt=0,tat=0,DEF={"s": "h0827-0917-0920-1010-1013-1058-1101-1156-1159-1349-1352-1437_tXXX_k0-0-0_r123_s26_f70-40-27-5_zLB", "at": 1791560036304};
+  function takeTimes(s){var b={done:st.done,fb:st.fb,x:st.x,ab:st.ab};decode(s);st.done=b.done;st.fb=b.fb;st.x=b.x;st.ab=b.ab;}
   function resetVolatile(){st.done=0;st.fb={};st.x='';st.ab='';}
   function abIdx(){if(!st.ab)return 99;for(var i=0;i<STOPS.length;i++)if(STOPS[i].t==='es'&&STOPS[i].h==='ES '+st.ab.slice(1))return i;return 99;}
   function skip(i){var t=STOPS[i].t;return i>=abIdx()&&(t==='es'||t==='assist'||t==='regroup'||/^Podium/.test(STOPS[i].h));}
@@ -436,15 +437,17 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
   function isX(n){return ('.'+st.x+'.').indexOf('.'+n+'.')>-1;}
   var ESKM={"15": 27.889, "16": 14.026, "17": 13.56, "18": 14.736, "19": 18.289};
   function readLocal(){try{var v=localStorage.getItem('tdch-j5');if(!v)return null;if(v.charAt(0)==='{')return JSON.parse(v);return {s:v,at:0};}catch(e){return null;}}
-  function writeLocal(){try{localStorage.setItem('tdch-j5',JSON.stringify({s:encode(),at:curAt}));}catch(e){}}
+  function writeLocal(){try{localStorage.setItem('tdch-j5',JSON.stringify({s:encode(),at:curAt,tat:tat}));}catch(e){}}
   var queuePublish=function(){};
   function save(){curAt=Date.now();writeLocal();queuePublish();}
   (function(){
     var h=(location.hash||'').replace(/^#/,''),lastH=null,loc=readLocal();
     try{lastH=localStorage.getItem('tdch-j5-hash');}catch(e){}
     if(h&&h!==lastH){decode(h);try{localStorage.setItem('tdch-j5-hash',h);}catch(e){}curAt=Date.now();writeLocal();}
-    else if(loc){decode(loc.s);curAt=loc.at||0;}
+    else if(loc){decode(loc.s);curAt=loc.at||0;tat=loc.tat||0;}
     else if(h){decode(h);}
+    if(!h&&!loc){decode(DEF.s);curAt=DEF.at;}
+    else if(!h&&DEF.at>tat){takeTimes(DEF.s);}
   })();
 
   // ---------- Horaires ----------
@@ -550,9 +553,9 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
   document.getElementById('edit-open').addEventListener('click',function(){buildEditor(st.times);form.hidden=false;});
   document.getElementById('ed-cancel').addEventListener('click',function(){form.hidden=true;});
   document.getElementById('ed-reset').addEventListener('click',function(){buildEditor(FIRST);});
-  form.addEventListener('submit',function(e){e.preventDefault();var o={};if(!KEYS.every(function(k){o[k]=document.getElementById('ed-'+k).value;return valid(o[k]);}))return;st.times=o;st.set=true;form.hidden=true;changed(true);});
+  form.addEventListener('submit',function(e){e.preventDefault();tat=Date.now();var o={};if(!KEYS.every(function(k){o[k]=document.getElementById('ed-'+k).value;return valid(o[k]);}))return;st.times=o;st.set=true;form.hidden=true;changed(true);});
   document.getElementById('off-apply').addEventListener('click',function(){
-    var v=document.getElementById('off-time').value;if(!valid(v))return;var d=toMin(v)-toMin(FIRST.ch14c);
+    var v=document.getElementById('off-time').value;if(!valid(v))return;tat=Date.now();var d=toMin(v)-toMin(FIRST.ch14c);
     KEYS.forEach(function(k){st.times[k]=fmt(toMin(FIRST[k])+d);});st.set=true;changed(true);
   });
   var share=el('div','card');share.hidden=true;share.innerHTML='<span class="label">Prévenir l’équipe</span>';
@@ -650,8 +653,9 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
       art.publish({'state.json':body}).then(function(){setStat('\u2713 Publié pour toute l\u2019équipe à '+hhmm(Date.now())+' : le lien simple affiche ces heures.');})
       .catch(function(e){var c=e&&e.code;if(c==='conflict'){setStat('');return;}if(c==='rate_limited'){setStat('Trop de publications d\u2019affilée : nouvel essai dans 30 s.');pubTimer=setTimeout(queuePublish,30000);return;}
         canPublish=false;setStat('Modifications gardées sur ce téléphone uniquement : envoie le message WhatsApp.');});},3000);};
-  fetch(STATE_FILE,{cache:'no-store'}).then(function(res){return res.ok?res.json():null;}).then(function(d){
+  fetch(STATE_FILE+'?t='+Date.now(),{cache:'no-store'}).then(function(res){return res.ok?res.json():null;}).then(function(d){
     if(d&&typeof d.s==='string'&&(d.at||0)>curAt){resetVolatile();decode(d.s);curAt=d.at;writeLocal();renderAll(false);}
+    else if(d&&typeof d.s==='string'&&(d.at||0)>tat){takeTimes(d.s);writeLocal();renderAll(false);}
     if(d&&d.at)setStat('Heures diffusées par l\u2019organisateur à '+hhmm(d.at)+'.');
   }).catch(function(){});
   (async function(){
