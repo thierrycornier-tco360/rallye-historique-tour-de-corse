@@ -222,7 +222,7 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
     <h2>À retenir</h2>
     <div class="alerts">
       <div class="alert bad"><b>Heures de la 1re voiture : à recaler</b><p>Sortie de parc de la 1re voiture à 7:00. Dès que l'heure de la voiture 36 est connue, utiliser « Recaler les heures » : tout se décale d'un coup, débuts et fins compris.</p></div>
-      <div class="alert"><b>Nouveau : début et fin de chaque étape</b><p>Spéciale : départ puis arrivée estimée. Assistance : arrivée estimée de la voiture puis heure de départ au plus tard. Les heures précédées de ≈ sont des estimations (moyenne 75 km/h en spéciale, 60 km/h en liaison).</p></div>
+      <div class="alert"><b>Nouveau : début et fin de chaque étape</b><p>Spéciale : départ puis arrivée estimée. Assistance : début (arrivée estimée de la voiture) et fin (heure à laquelle elle doit repartir). Les heures précédées de ≈ sont des estimations (moyenne 75 km/h en spéciale, 60 km/h en liaison).</p></div>
       <div class="alert bad"><b>Assistance 21 : la plus importante</b><p>Après l'ES 18, environ 45 min avant la liaison de 52 km vers l'ES 19. C'est la dernière intervention possible du rallye.</p></div>
       <div class="alert"><b>Enchaînements sans assistance</b><p>ES 15 + ES 16 (41,9 km) après l'assistance 19, puis ES 17 + ES 18 (28,3 km) après l'assistance 20.</p></div>
       <div class="alert"><b>Arrivée finale à Calvi</b><p>Parc fermé de Calvi, pointage en avance autorisé.</p></div>
@@ -466,9 +466,9 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
     STOPS.forEach(function(s,i){
       var li=el('li','stop'+(s.t==='assist'?' assist':s.t==='regroup'?' regroup':''));li.dataset.i=i;
       var w=win(s),tm=el('div','time');
-      tm.appendChild(el('small',null,s.t==='assist'?'arrivée':s.t==='es'?'départ':s.t==='regroup'?'entrée':s.h.indexOf('Sortie')===0?'sortie':'pointage'));
+      tm.appendChild(el('small',null,s.t==='es'?'départ':(s.t==='parc'&&i===STOPS.length-1)?'fin':'début'));
       tm.appendChild(el('div','clock'+(s.t==='assist'?' soft':''),(w.ea?'\u2248':'')+fmt(w.a)));
-      if(w.b!=null){tm.appendChild(el('small',null,s.t==='assist'?'repart avant':s.t==='es'?'arrivée':'sortie'));tm.appendChild(el('div','clock end',(w.eb?'\u2248':'')+fmt(w.b)));}
+      if(w.b!=null){tm.appendChild(el('small',null,s.t==='es'?'arrivée':'fin'));tm.appendChild(el('div','clock end',(w.eb?'\u2248':'')+fmt(w.b)));}
       var cd=el('div','scard'),top=el('div','top'),h=el('h3',s.t==='es'?'es':null,s.h);top.appendChild(h);
       if(s.km||s.dur)top.appendChild(el('span','dur',s.km||s.dur));
       cd.append(top,el('div','place',s.p));
