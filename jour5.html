@@ -89,6 +89,11 @@ h1{font-size:2.2rem;font-weight:800;text-transform:uppercase}
 .time{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
 .clock{font:700 1.1rem var(--f-mono);font-variant-numeric:tabular-nums;background:var(--signal);color:var(--signal-ink);border-radius:5px;padding:6px 4px;width:100%}
 .clock.end{background:transparent;color:var(--ink);border:1.5px dashed var(--line);font-size:.95rem;padding:4px}
+.hotline{display:flex;align-items:center;gap:14px;background:var(--stage);color:#fff;text-decoration:none;border-radius:12px;padding:16px 18px;box-shadow:0 4px 14px rgba(200,16,46,.35)}
+.hotline .ic{font-size:2rem;line-height:1}
+.hotline b{display:block;font:800 1.35rem var(--f-display);letter-spacing:.5px;text-transform:uppercase}
+.hotline span{display:block;font-size:1rem;opacity:.95}
+.hotline .hnum{font:700 1.25rem var(--f-mono);margin-top:2px}
 .clock.soft{background:transparent;color:var(--ink);border:2px solid var(--signal)}
 .time small{color:var(--muted);line-height:1.2}
 .scard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 13px;display:flex;flex-direction:column;gap:6px;min-width:0}
@@ -197,6 +202,8 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
       <span class="fact">Arrivée <b>Calvi</b></span>
     </div>
   </header>
+
+  <a class="hotline" href="tel:+33647974077" aria-label="Appeler la hotline super assistance 24 heures sur 24, Édouard Bourel, 06 47 97 40 77"><span class="ic" aria-hidden="true">📞</span><span><b>Hotline super assistance 24/24</b><span>Édouard Bourel</span><span class="hnum">06 47 97 40 77</span></span></a>
 
   <div id="offset-banner" class="banner todo" hidden>
     <b>Horaires de la 1re voiture</b>
