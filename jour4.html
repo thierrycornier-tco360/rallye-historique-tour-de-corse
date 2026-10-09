@@ -102,9 +102,13 @@ h1{font-size:2.2rem;font-weight:800;text-transform:uppercase}
 .chip.info{background:var(--info-bg);color:var(--info)}
 .stop.assist .scard{border:2px solid var(--signal)}
 .stop.regroup .scard{border:2px solid var(--ink);background:transparent}
-.stop.done .scard>:not(.fb):not(.donebtn),.stop.done .time{opacity:.45} .stop.next .scard{box-shadow:0 0 0 3px var(--signal)}
+.stop.done .scard>:not(.fb):not(.donebtn):not(.acts),.stop.done .time{opacity:.45} .stop.next .scard{box-shadow:0 0 0 3px var(--signal)}
 .donebtn{align-self:flex-start;font-size:.88rem;padding:6px 12px}
-.stop.done .donebtn.tbtn{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
+.acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.donebtn.go{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.donebtn.link{border:none;background:none;text-decoration:underline;padding:4px 6px;color:var(--muted);font-weight:500}
+.chip.ok{background:var(--ok-bg);color:var(--ok);font-size:.9rem;padding:4px 10px}
+details.more{width:100%}details.more summary{cursor:pointer;color:var(--muted);font-size:.88rem;padding:4px 0;list-style-position:inside}details.more[open]{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
 .fb button.sel{background:var(--ok-bg);color:var(--ok);border-color:var(--ok);font-weight:700}
 .stop.cancel .scard h3,.stop.cancel .scard .place{text-decoration:line-through}
 .chip.bad{background:var(--bad-bg);color:var(--bad)}
@@ -465,35 +469,43 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
       if(s.x)cd.appendChild(el('p','task',s.x));
       var xid=s.t==='es'?s.h.slice(3):'i'+i;
       if(skip(i)){li.classList.add('cancel');cd.appendChild(el('span','chip bad',s.t==='es'?'Non courue (abandon)':'Sans objet (abandon)'));}
-      if(s.t==='es'){var en=s.h.slice(3);
-        if(!st.ab){[['t','Abandon temporaire'],['d','Abandon définitif']].forEach(function(o){var b=el('button','donebtn',o[1]+' à l\u2019ES '+en);b.type='button';b.addEventListener('click',function(){if(!confirm(o[1]+' à l\u2019ES '+en+' ? Les spéciales suivantes de la journée seront marquées non courues.'))return;st.ab=o[0]+en;changed(true);});cd.appendChild(b);});}
-        else if(st.ab.slice(1)===en){var b=el('button','donebtn','Annuler l\u2019abandon');b.type='button';b.addEventListener('click',function(){st.ab='';changed(true);});cd.appendChild(b);}}
-      if(isX(xid)){li.classList.add('cancel');cd.appendChild(el('span','chip bad',s.t==='es'?'ES annulée':'Annulée'));}
       var isDone=!!(st.done&(1<<i));li.classList.toggle('done',isDone);
-      var btn=el('button','donebtn tbtn',isDone?'\u2713 Terminé (annuler)':'Marquer terminé');btn.type='button';
-      btn.addEventListener('click',function(){st.done^=(1<<i);changed();});
-      cd.appendChild(btn);
-      (function(n,isEs){var xb=el('button','donebtn',isX(n)?(isEs?'Rétablir l\u2019ES '+n:'Rétablir'):(isEs?'Marquer l\u2019ES '+n+' annulée':'Marquer annulée'));xb.type='button';
-        xb.addEventListener('click',function(){var L=st.x?st.x.split('.'):[];if(isX(n)){L=L.filter(function(v){return v!==n;});st.done&=~(1<<i);}else{L.push(n);st.done|=(1<<i);}st.x=L.join('.');changed();});
-        cd.appendChild(xb);})(xid,s.t==='es');
-      if(s.t==='es')cd.appendChild(fbBox(s.h.slice(3),i));
+      var en=s.t==='es'?s.h.slice(3):null,abHere=!!(en&&st.ab&&st.ab.slice(1)===en);
+      if(isX(xid)){li.classList.add('cancel');cd.appendChild(el('span','chip bad',s.t==='es'?'ES annulée':'Annulée'));}
+      var acts=el('div','acts');
+      if(isX(xid))acts.appendChild(mkBtn('Rétablir',function(){toggleX(xid,i);}));
+      else if(abHere)acts.appendChild(mkBtn('Annuler l\u2019abandon',function(){st.ab='';changed(true);}));
+      else if(!skip(i)){
+        if(isDone)acts.append(el('span','chip ok','\u2713 Terminé'),mkBtn('annuler',function(){st.done&=~(1<<i);changed();},'link'));
+        else acts.appendChild(mkBtn('Marquer terminé',function(){st.done|=(1<<i);changed();},'go'));
+        var more=el('details','more');more.appendChild(el('summary',null,'Autres options'));
+        more.appendChild(mkBtn(s.t==='es'?'ES annulée par l\u2019organisation':'Étape annulée',function(){toggleX(xid,i);}));
+        if(en&&!st.ab)[['t','Abandon temporaire'],['d','Abandon définitif']].forEach(function(o){more.appendChild(mkBtn(o[1]+' à l\u2019ES '+en,function(){if(!confirm(o[1]+' à l\u2019ES '+en+' ? Les spéciales suivantes de la journée seront marquées non courues.'))return;st.ab=o[0]+en;changed(true);}));});
+        acts.appendChild(more);
+      }
+      cd.appendChild(acts);
+      if(en&&!isX(xid)&&!skip(i))cd.appendChild(fbBox(en,i));
       li.append(tm,cd);ol.appendChild(li);
     });
     tick();
   }
+  function mkBtn(t,fn,cls){var b=el('button','donebtn'+(cls?' '+cls:''),t);b.type='button';b.addEventListener('click',fn);return b;}
+  function toggleX(n,i){var L=st.x?st.x.split('.'):[];if(isX(n)){L=L.filter(function(v){return v!==n;});st.done&=~(1<<i);}else{L.push(n);st.done|=(1<<i);}st.x=L.join('.');changed();}
   function fbBox(n,i){
     var box=el('div','fb'),f=st.fb[n];
     box.appendChild(el('span','label','Retour copilote · ES '+n));
-    if(f){box.appendChild(el('div','saved'+(f==='ok'?'':' c'),f==='ok'?'\u2713 OK, rien à signaler':f));}
-    var row=el('div','row'),ok=el('button',f==='ok'?'sel':null,f==='ok'?'\u2713 OK (choisi)':'\u2713 OK');ok.type='button';
-    var ta=el('textarea');ta.id='fb-'+n;ta.placeholder='Commentaire : pneus, freins, ressenti, problème…';ta.setAttribute('aria-label','Commentaire copilote ES '+n);if(f&&f!=='ok')ta.value=f;
-    var send=el('button','primary','Enregistrer le commentaire');send.type='button';
-    ok.addEventListener('click',function(){st.fb[n]='ok';st.done|=(1<<i);lastFb=n;changed();});
-    send.addEventListener('click',function(){var t=ta.value.trim();if(!t)return;st.fb[n]=t.slice(0,500);st.done|=(1<<i);lastFb=n;changed();});
-    row.append(ok);box.append(row,ta,send);
-    if(f){var cl=el('button',null,'Effacer le retour');cl.type='button';cl.addEventListener('click',function(){delete st.fb[n];if(lastFb===n)lastFb=null;changed();});box.appendChild(cl);}
+    if(f&&editFb!==n){
+      box.appendChild(el('div','saved'+(f==='ok'?'':' c'),f==='ok'?'\u2713 OK, rien à signaler':f));
+      var r=el('div','row');r.append(mkBtn('modifier',function(){editFb=n;renderStops();},'link'),mkBtn('effacer',function(){delete st.fb[n];if(lastFb===n)lastFb=null;changed();},'link'));box.appendChild(r);
+      return box;
+    }
+    var ok=mkBtn('\u2713 OK, rien à signaler',function(){st.fb[n]='ok';st.done|=(1<<i);lastFb=n;editFb=null;changed();});
+    var ta=el('textarea');ta.id='fb-'+n;ta.placeholder='Ou un commentaire : pneus, freins, ressenti, problème…';ta.setAttribute('aria-label','Commentaire copilote ES '+n);if(f&&f!=='ok')ta.value=f;
+    var send=mkBtn('Enregistrer le commentaire',function(){var t=ta.value.trim();if(!t)return;st.fb[n]=t.slice(0,500);st.done|=(1<<i);lastFb=n;editFb=null;changed();},'go');
+    box.append(ok,ta,send);
     return box;
   }
+  var editFb=null;
   var lastFb=null;
   function tick(){
     var now=new Date(),nm=now.getHours()*60+now.getMinutes(),next=null;
