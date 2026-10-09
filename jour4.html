@@ -104,7 +104,8 @@ h1{font-size:2.2rem;font-weight:800;text-transform:uppercase}
 .stop.regroup .scard{border:2px solid var(--ink);background:transparent}
 .stop.done .scard>:not(.fb):not(.donebtn),.stop.done .time{opacity:.45} .stop.next .scard{box-shadow:0 0 0 3px var(--signal)}
 .donebtn{align-self:flex-start;font-size:.88rem;padding:6px 12px}
-.stop.done .donebtn{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
+.stop.done .donebtn.tbtn{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
+.fb button.sel{background:var(--ok-bg);color:var(--ok);border-color:var(--ok);font-weight:700}
 .stop.cancel .scard h3,.stop.cancel .scard .place{text-decoration:line-through}
 .chip.bad{background:var(--bad-bg);color:var(--bad)}
 .late{font:700 .8rem var(--f-mono);color:var(--bad)}
@@ -469,7 +470,7 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
         else if(st.ab.slice(1)===en){var b=el('button','donebtn','Annuler l\u2019abandon');b.type='button';b.addEventListener('click',function(){st.ab='';changed(true);});cd.appendChild(b);}}
       if(isX(xid)){li.classList.add('cancel');cd.appendChild(el('span','chip bad',s.t==='es'?'ES annulée':'Annulée'));}
       var isDone=!!(st.done&(1<<i));li.classList.toggle('done',isDone);
-      var btn=el('button','donebtn',isDone?'\u2713 Terminé (annuler)':'Marquer terminé');btn.type='button';
+      var btn=el('button','donebtn tbtn',isDone?'\u2713 Terminé (annuler)':'Marquer terminé');btn.type='button';
       btn.addEventListener('click',function(){st.done^=(1<<i);changed();});
       cd.appendChild(btn);
       (function(n,isEs){var xb=el('button','donebtn',isX(n)?(isEs?'Rétablir l\u2019ES '+n:'Rétablir'):(isEs?'Marquer l\u2019ES '+n+' annulée':'Marquer annulée'));xb.type='button';
@@ -484,7 +485,7 @@ ol.legs li b{font-family:var(--f-display);text-transform:uppercase;font-size:1.0
     var box=el('div','fb'),f=st.fb[n];
     box.appendChild(el('span','label','Retour copilote · ES '+n));
     if(f){box.appendChild(el('div','saved'+(f==='ok'?'':' c'),f==='ok'?'\u2713 OK, rien à signaler':f));}
-    var row=el('div','row'),ok=el('button',null,'\u2713 OK');ok.type='button';
+    var row=el('div','row'),ok=el('button',f==='ok'?'sel':null,f==='ok'?'\u2713 OK (choisi)':'\u2713 OK');ok.type='button';
     var ta=el('textarea');ta.id='fb-'+n;ta.placeholder='Commentaire : pneus, freins, ressenti, problème…';ta.setAttribute('aria-label','Commentaire copilote ES '+n);if(f&&f!=='ok')ta.value=f;
     var send=el('button','primary','Enregistrer le commentaire');send.type='button';
     ok.addEventListener('click',function(){st.fb[n]='ok';st.done|=(1<<i);lastFb=n;changed();});
